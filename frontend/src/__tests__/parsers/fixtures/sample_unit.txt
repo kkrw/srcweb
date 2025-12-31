@@ -1,0 +1,91 @@
+# Unit Data Test Fixture
+# Tests various parsing scenarios
+
+## Test 1: Full unit with kana, robot unit, new format abilities, multiple weapons
+テストユニット１
+テストユニット１, てすとゆにっと, ロボット, 1, 2
+陸, 4, M, 3500, 90
+特殊能力
+シールドLv3=強化シールド
+分身Lv2
+3400, 110, 1200, 85
+AABA, test_unit1.bmp
+ビームライフル, 1600, 2, 4, -10, -, 30, -, AA-A, +10, Ｂ
+ビームサーベル, 1350, 1, 1, +19, -, -, -, AAAA, +5, 武
+ミサイル, 1400, 1, 3, +5, 6, 20, -, AAAA, +10, Ｍ投L1Ｐ実
+===
+修理装置, 回復Lv3, 1, 5, -, -, -
+補給装置, 補給, 1, 3, -, -, -
+
+## Test 2: Human unit (class in parentheses), no kana, old format abilities
+人間ユニット
+戦士, (戦士), 1, 1
+陸, 5, SS, 1000, 80
+特殊能力, 底力, 切り払いLv2=剣術
+2500, 50, 500, 120
+AAAA, human.bmp
+剣, 800, 1, 1, +15, -, -, -, AAAA, +5, 武
+弓, 900, 2, 3, +5, 12, -, -, AAAA, +0, -
+
+## Test 3: No abilities ("特殊能力なし")
+シンプルユニット
+シンプル, 汎用機, 1, 0
+空陸, 5, S, 2000, 50
+特殊能力なし
+2000, 80, 800, 90
+AAAA, simple.bmp
+通常攻撃, 1000, 1, 1, +0, -, -, -, AAAA, +0, -
+
+## Test 4: No weapons, no abilities
+最小ユニット
+最小, 最小機, 1, 0
+陸, 3, M, 1500, 30
+特殊能力なし
+1500, 60, 600, 70
+AABA, minimal.bmp
+
+## Test 5: Multiple traits in weapon, ability with multiple effects
+複合ユニット
+複合, マルチ機, 2, 3
+空陸水, 6, L, 4500, 120
+特殊能力
+バリアLv2=念動バリア 全 10
+ＨＰ回復Lv3
+3800, 140, 1400, 95
+AAAA, multi.bmp
+複合攻撃, 1800, 1, 2, +10, -, 40, 120, AAAA, +15, 格射複Ｍ全火水
+===
+全体回復, 付加Lv2="回復Lv2" 回復Lv1, 3, -, 50, -, Ｍ全援
+
+## Test 6: Line continuation with underscore
+長名称ユニット
+長い名前のユニット, ながいなまえのゆにっと, 特殊機体, 1, 4
+陸, 4, M, 3200, 85
+特殊能力
+超回避Lv5=残像 _
+気力140以上で発動し、敵の命中率を大幅に下げる高速回避能力
+3300, 105, 1100, 88
+AABA, long_name.bmp
+超長射程ビーム砲, 2000, 3, 8, -15, -, 60, 130, AA-A, +5, ＢＰ _
+Ｈ有
+近接格闘武器, 1500, 1, 1, +20, -, -, -, AAAA, +10, 武先
+
+## Test 7: Special ability with解説 definition
+解説ユニット
+解説テスト, 説明機, 1, 2
+陸, 4, M, 3000, 75
+特殊能力
+カスタム能力Lv3=特殊スキル
+特殊スキル=解説 特別な訓練により習得した独自の戦闘技術
+3100, 100, 1000, 80
+AAAA, explain.bmp
+標準武器, 1200, 1, 2, +5, -, 25, -, AAAA, +5, -
+
+## Test 8: No trailing newline (will be added by Write, but tests robustness)
+改行なし
+改行テスト, かいぎょうてすと, テスト機, 1, 1
+陸, 4, M, 2500, 60
+特殊能力なし
+2500, 90, 900, 75
+AAAA, no_newline.bmp
+攻撃, 1100, 1, 1, +0, -, -, -, AAAA, +0, -
