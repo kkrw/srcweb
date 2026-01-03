@@ -42,7 +42,7 @@ export interface AbilityData {
   /**
    * 使用時に消費するEN量
    */
-  ENConsumption: number;
+  ENCost: number;
 
   /**
    * 使用に必要な気力
@@ -103,7 +103,7 @@ export function createAbilityData(params: Partial<AbilityData> = {}): AbilityDat
   return {
     Name: params.Name || "",
     Stock: params.Stock || 0,
-    ENConsumption: params.ENConsumption || 0,
+    ENCost: params.ENCost || 0,
     RequiredMorale: params.RequiredMorale || 0,
     MinRange: params.MinRange || 0,
     MaxRange: params.MaxRange || 0,

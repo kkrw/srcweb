@@ -39,7 +39,7 @@ export interface WeaponData {
   /**
    * 攻撃1回あたりのエネルギー消費量
    */
-  ENConsumption: number;
+  ENCost: number;
 
   /**
    * 攻撃を使用するために必要なパイロットの気力値
@@ -89,9 +89,9 @@ export function createWeaponData(params: Partial<WeaponData> = {}): WeaponData {
     MaxRange: params.MaxRange || 1,
     AccuracyMod: params.AccuracyMod || 0,
     Ammo: params.Ammo || 0,
-    ENConsumption: params.ENConsumption || 0,
+    ENCost: params.ENCost || 0,
     RequiredMorale: params.RequiredMorale || 0,
-    Adaptation: params.Adaptation || "----",
+    Adaptation: params.Adaptation || "AAAA",
     CriticalMod: params.CriticalMod || 0,
     Traits: params.Traits || "",
     RequiredSkill: params.RequiredSkill || "",

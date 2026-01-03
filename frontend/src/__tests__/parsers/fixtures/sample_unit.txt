@@ -11,11 +11,11 @@
 3400, 110, 1200, 85
 AABA, test_unit1.bmp
 ビームライフル, 1600, 2, 4, -10, -, 30, -, AA-A, +10, Ｂ
-ビームサーベル, 1350, 1, 1, +19, -, -, -, AAAA, +5, 武
-ミサイル, 1400, 1, 3, +5, 6, 20, -, AAAA, +10, Ｍ投L1Ｐ実
+ビームサーベル, 1350, 1, 1, +19, -, -, 105, AAAA, +5, 武
+ミサイル, 1400, 1, 3, +5, 6, 20, -, AAAA, -10, Ｍ投L1Ｐ実
 ===
 修理装置, 回復Lv3, 1, 5, -, -, -
-補給装置, 補給, 1, 3, -, -, -
+補給装置, 補給, 1, 3, -, 105, -
 
 ## Test 2: Human unit (class in parentheses), no kana, old format abilities
 人間ユニット
@@ -81,11 +81,105 @@ AABA, long_name.bmp
 AAAA, explain.bmp
 標準武器, 1200, 1, 2, +5, -, 25, -, AAAA, +5, -
 
-## Test 8: No trailing newline (will be added by Write, but tests robustness)
-改行なし
+## Test 8: Line continuation with underscore in feature
+改行テスト
 改行テスト, かいぎょうてすと, テスト機, 1, 1
 陸, 4, M, 2500, 60
-特殊能力なし
+特殊能力
+超回避Lv5=残像 _
+気力140以上で発動し、敵の命中率を大幅に下げる高速回避能力
 2500, 90, 900, 75
-AAAA, no_newline.bmp
+AAAA, line_continuation.bmp
 攻撃, 1100, 1, 1, +0, -, -, -, AAAA, +0, -
+
+## Test 9: Multiple abilities in one line (new format)
+複数能力１行
+複数能力テスト, ふくすうのうりょく, 複合型, 1, 2
+陸, 5, M, 3000, 70
+特殊能力
+霊力変換器Lv100, ＨＰ回復Lv2
+3100, 120, 1100, 80
+AAAA, multi_ability.bmp
+通常攻撃, 1200, 1, 2, +5, -, -, -, AAAA, +0, -
+
+## Test 10: Negative and zero level abilities
+レベル指定
+レベルテスト, れべるてすと, 実験機, 1, 1
+陸, 4, M, 2800, 65
+特殊能力
+ＨＰ回復Lv-1
+ＥＮ回復Lv0
+2900, 100, 950, 78
+AAAA, level_test.bmp
+攻撃, 1150, 1, 2, +0, -, -, -, AAAA, +0, -
+
+## Test 11: Hidden ability and space-separated options
+非表示・オプション
+オプションテスト, おぷしょん, 隠密機, 1, 2
+空陸, 5, S, 2700, 68
+特殊能力
+ホバー移動=非表示
+バリアLv1=念動バリア 全 10
+2800, 95, 900, 85
+AAAA, option_test.bmp
+攻撃, 1100, 1, 2, +5, -, -, -, AAAA, +0, -
+
+## Test 12: Dummy abilities with various formats including quoted comma
+ダミー能力
+ダミーテスト, だみー, 魔法機, 1, 3
+陸, 4, M, 3200, 75
+特殊能力
+カスタム能力Lv3=特殊スキル
+守護聖霊=風の聖霊シルフ 風の属性を持つ攻撃に対して耐性を持つ
+守護聖霊2=水の聖霊ウンディーネ "水の属性を持つ攻撃に対して耐性を持ち、火系攻撃に弱い"
+守護聖霊3=大地の聖霊ノーム "大地, 土, 岩の属性に強く, 風系攻撃に弱い"
+特殊スキル=解説 特別な訓練により習得した独自の戦闘技術
+3300, 110, 1050, 82
+AAAA, dummy_test.bmp
+攻撃, 1250, 1, 2, +5, -, -, -, AAAA, +0, -
+
+## Test 13: Required skills and conditions for abilities
+必要技能テスト
+技能テスト, ぎのうてすと, 特殊型, 1, 2
+陸, 4, M, 3100, 72
+特殊能力
+バリアLv2=念動バリア 全 10 (念力Lv3)
+ステルス=狩人 <@森 or @林>
+ＺＯＣ=砂地獄 <地上> (土遁の術Lv4)
+3200, 105, 1000, 80
+AAAA, skill_test.bmp
+通常攻撃, 1200, 1, 2, +0, -, -, -, AAAA, +0, -
+
+## Test 14: Required skills and conditions for weapons
+武器条件テスト
+武器技能テスト, ぶきぎのう, 条件機, 1, 2
+陸, 4, M, 3000, 70
+特殊能力なし
+3100, 100, 1000, 75
+AAAA, weapon_condition.bmp
+念動斬り, 1350, 1, 1, +19, -, -, -, AAAA, +5, 武 (念力Lv3)
+ドリルアタック, 1350, 1, 1, +19, -, -, -, AAAA, +5, 武 <母艦3マス以内>
+森林剣, 1400, 1, 2, +10, -, -, -, AAAA, +5, 武 <@森 or @林> (剣技Lv2)
+
+## Test 15: Required skills and conditions for unit abilities
+アビリティ条件テスト
+アビリティ技能テスト, あびりてぃぎのう, 支援機, 1, 3
+陸, 4, M, 2900, 68
+特殊能力なし
+3000, 110, 950, 77
+AAAA, ability_condition.bmp
+===
+癒しの光, 回復Lv3, 1, -, 30, -, - (術Lv3)
+森林浴, 回復Lv2, 1, -, 20, -, - <@森 or @林>
+森のカーニバル, 回復Lv3, 3, -, 60, 120, Ｍ全 <@森 or @林> (術Lv4)
+
+## Test 16: Complex condition expressions
+複雑条件
+複雑条件テスト, ふくざつじょうけん, 環境機, 1, 2
+陸, 5, M, 3100, 73
+特殊能力
+地形適応=森林戦仕様 森 林
+追加移動力Lv2=森林機動 <@森 or @林 地上>
+3200, 100, 1050, 80
+AAAA, complex_condition.bmp
+森林砲, 1500, 2, 4, +5, -, 25, -, AAAA, +10, - <@森 or @林 地上>

@@ -1,0 +1,15 @@
+# Error: Unit name with half-width space (FATAL)
+# 1st unit should fail, 2nd unit should not be parsed
+Invalid Name
+無効 名前, いんばりっど, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+
+正常ユニット
+正常ユニット, せいじょう, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp

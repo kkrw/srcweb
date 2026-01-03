@@ -1,0 +1,296 @@
+# Invalid Unit Data - Warnings (Non-Fatal)
+# These errors should produce warnings but parsing should continue
+
+## Warning 1: Numeric unit class
+数値クラス
+数値クラス, すうちくらす, 123, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 2: Non-numeric pilot capacity
+非数値パイロット
+非数値パイロット, ひすうちぱいろっと, テスト機, abc, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 3: Pilot capacity less than 1 (zero)
+ゼロパイロット
+ゼロパイロット, ぜろぱいろっと, テスト機, 0, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 4: Negative pilot capacity
+負数パイロット
+負数パイロット, ふすうぱいろっと, テスト機, -5, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 5: Non-numeric item slots
+非数値アイテム
+非数値アイテム, ひすうちあいてむ, テスト機, 1, xyz
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 6: Numeric movement type
+数値移動
+数値移動, すうちいどう, テスト機, 1, 0
+123, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 7: Non-numeric speed
+非数値移動力
+非数値移動力, ひすうちいどうりょく, テスト機, 1, 0
+陸, abc, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 8: Invalid size
+無効サイズ
+無効サイズ, むこうさいず, テスト機, 1, 0
+陸, 4, XYZ, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 9: Non-numeric cost
+非数値修理費
+非数値修理費, ひすうちしゅうりひ, テスト機, 1, 0
+陸, 4, M, abc, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 10: Non-numeric exp value
+非数値経験値
+非数値経験値, ひすうちけいけんち, テスト機, 1, 0
+陸, 4, M, 2000, xyz
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 11: Empty feature in new format
+空特殊能力新形式
+空特殊能力, からとくしゅ, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力
+, ＨＰ回復Lv2
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 12: Numeric feature in new format
+数値特殊能力新形式
+数値特殊能力, すうちとくしゅ, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力
+123
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 13: Empty feature in old format
+空特殊能力旧形式
+空特殊能力旧, からきゅう, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力, , ＨＰ回復Lv2
+2000, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 14: Non-numeric HP
+非数値HP
+非数値HP, ひすうちえいちぴー, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+abc, 100, 800, 80
+AAAA, test.bmp
+
+## Warning 15: Non-numeric EN
+非数値EN
+非数値EN, ひすうちいーえぬ, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, xyz, 800, 80
+AAAA, test.bmp
+
+## Warning 16: Non-numeric armor
+非数値装甲
+非数値装甲, ひすうちそうこう, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, abc, 80
+AAAA, test.bmp
+
+## Warning 17: Non-numeric mobility
+非数値運動性
+非数値運動性, ひすうちうんどうせい, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, xyz
+AAAA, test.bmp
+
+## Warning 18: Invalid adaptation length
+無効地形適応
+無効地形適応, むこうちけいてきおう, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AA, test.bmp
+
+## Warning 19: Bitmap without .bmp extension
+無効ビットマップ
+無効ビットマップ, むこうびっとまっぷ, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.png
+
+## Warning 20: Non-numeric weapon attack power
+武器攻撃力無効
+武器攻撃力, ぶきこうげきりょく, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+無効攻撃, abc, 1, 1, +0, -, -, -, AAAA, +0, -
+
+## Warning 21: Non-numeric weapon min range
+武器最小射程無効
+武器最小, ぶきさいしょう, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+無効射程, 1000, abc, 1, +0, -, -, -, AAAA, +0, -
+
+## Warning 22: Non-numeric weapon max range
+武器最大射程無効
+武器最大, ぶきさいだい, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+無効最大, 1000, 1, xyz, +0, -, -, -, AAAA, +0, -
+
+## Warning 23: Non-numeric weapon accuracy
+武器命中率無効
+武器命中, ぶきめいちゅう, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+無効命中, 1000, 1, 1, abc, -, -, -, AAAA, +0, -
+
+## Warning 24: Non-numeric weapon ammo
+武器弾数無効
+武器弾数, ぶきだんすう, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+無効弾数, 1000, 1, 1, +0, xyz, -, -, AAAA, +0, -
+
+## Warning 25: Non-numeric weapon EN cost
+武器EN無効
+武器EN, ぶきいーえぬ, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+無効EN, 1000, 1, 1, +0, -, abc, -, AAAA, +0, -
+
+## Warning 26: Non-numeric weapon morale
+武器気力無効
+武器気力, ぶききりょく, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+無効気力, 1000, 1, 1, +0, -, -, xyz, AAAA, +0, -
+
+## Warning 27: Invalid weapon adaptation length
+武器地形適応無効
+武器地形, ぶきちけい, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+無効地形, 1000, 1, 1, +0, -, -, -, AA, +0, -
+
+## Warning 28: Non-numeric weapon critical
+武器クリティカル無効
+武器クリティカル, ぶきくりてぃかる, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+無効クリティカル, 1000, 1, 1, +0, -, -, -, AAAA, abc, -
+
+## Warning 29: Weapon with Lv in traits
+武器属性Lv無効
+武器属性Lv, ぶきぞくせい, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+無効属性, 1000, 1, 1, +0, -, -, -, AAAA, +0, ＢLv3
+
+## Warning 30: Non-numeric ability max range (not dash)
+アビリティ射程無効
+アビリティ射程, あびりてぃしゃてい, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+===
+無効射程, 回復Lv2, abc, -, -, -, -
+
+## Warning 31: Non-numeric ability stock
+アビリティ回数無効
+アビリティ回数, あびりてぃかいすう, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+===
+無効回数, 回復Lv2, 1, xyz, -, -, -
+
+## Warning 32: Non-numeric ability EN cost
+アビリティEN無効
+アビリティEN, あびりてぃいーえぬ, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+===
+無効EN, 回復Lv2, 1, -, abc, -, -
+
+## Warning 33: Non-numeric ability morale
+アビリティ気力無効
+アビリティ気力, あびりてぃきりょく, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+===
+無効気力, 回復Lv2, 1, -, -, xyz, -
+
+## Warning 34: Ability with Lv in traits
+アビリティ属性Lv無効
+アビリティ属性Lv, あびりてぃぞくせい, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp
+===
+無効属性, 回復Lv2, 1, -, -, -, 援Lv2

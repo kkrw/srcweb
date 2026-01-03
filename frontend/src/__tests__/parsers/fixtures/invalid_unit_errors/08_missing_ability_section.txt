@@ -1,0 +1,13 @@
+# Error: Missing special ability section (FATAL)
+不足特殊能力
+不足特殊能力, ふそく, テスト機, 1, 0
+陸, 4, M, 2000, 50
+2000, 100, 800, 80
+AAAA, test.bmp
+
+第二（括弧）
+第二括弧, だいに, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+AAAA, test.bmp

@@ -4,6 +4,15 @@
  * All game data models are exported from this file for convenient importing.
  */
 
+// Branded Types
+export type { Integer, Float } from "./BrandedTypes";
+export {
+  isInteger,
+  toInteger,
+  toFloat,
+  hasDecimalPart,
+} from "./BrandedTypes";
+
 // Feature Data
 export type { FeatureData } from "./FeatureData";
 export { DEFAULT_LEVEL, createFeatureData } from "./FeatureData";

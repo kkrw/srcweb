@@ -146,7 +146,7 @@ export function createUnitData(params: Partial<UnitData> = {}): UnitData {
     UnitClass: params.UnitClass || "",
     PilotCapacity: params.PilotCapacity || 1,
     NumItemSlots: params.NumItemSlots || 0,
-    Adaptation: params.Adaptation || "----",
+    Adaptation: params.Adaptation || "AAAA",
     HP: params.HP || 0,
     EN: params.EN || 0,
     MovementType: params.MovementType || "",

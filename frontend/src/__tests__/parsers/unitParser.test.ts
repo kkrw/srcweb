@@ -2,102 +2,216 @@
  * Unit Parser Tests
  */
 
-import { parseUnitFile } from '../../parsers/unitParser';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { describe, expect, it } from "vitest";
+import { parseUnitFile } from "../../parsers/unitParser";
 
-describe('Unit Parser', () => {
-  const fixturesPath = join(__dirname, 'fixtures');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+describe("Unit Parser", () => {
+  const fixturesPath = join(__dirname, "fixtures");
   const sampleUnitText = readFileSync(
-    join(fixturesPath, 'sample_unit.txt'),
-    'utf-8'
+    join(fixturesPath, "sample_unit.txt"),
+    "utf-8"
   );
 
-  describe('parseUnitFile', () => {
-    it('should successfully parse valid unit data', () => {
+  describe("parseUnitFile", () => {
+    // 取り込みが成功すること
+    it("should successfully parse valid unit data", () => {
       const result = parseUnitFile(sampleUnitText);
 
       expect(result.success).toBe(true);
-      if (!result.success) return;
+      if (!result.success) {
+        throw new Error(`Parse failed: ${result.error.message}`);
+      }
 
       expect(result.data).toBeInstanceOf(Array);
-      expect(result.data.length).toBeGreaterThan(0);
+      expect(result.data.length).toBe(16);
+
+      const unitNames = result.data.map((u) => u.Name);
+      expect(unitNames).toContain("テストユニット１");
+      expect(unitNames).toContain("人間ユニット");
+      expect(unitNames).toContain("シンプルユニット");
+      expect(unitNames).toContain("最小ユニット");
+      expect(unitNames).toContain("複合ユニット");
+      expect(unitNames).toContain("長名称ユニット");
+      expect(unitNames).toContain("解説ユニット");
+      expect(unitNames).toContain("改行テスト");
+      expect(unitNames).toContain("複数能力１行");
+      expect(unitNames).toContain("レベル指定");
+      expect(unitNames).toContain("非表示・オプション");
+      expect(unitNames).toContain("ダミー能力");
+      expect(unitNames).toContain("必要技能テスト");
+      expect(unitNames).toContain("武器条件テスト");
+      expect(unitNames).toContain("アビリティ条件テスト");
+      expect(unitNames).toContain("複雑条件");
     });
 
-    it('should parse Test Unit 1 with kana and new format abilities', () => {
+    // Test1
+    it("Test1: should parse Test Unit 1 with kana and new format abilities", () => {
       const result = parseUnitFile(sampleUnitText);
 
       if (!result.success) {
-        fail(`Parse failed: ${result.error.message}`);
+        throw new Error(`Parse failed: ${result.error.message}`);
       }
 
-      const unit1 = result.data.find((u) => u.Name === 'テストユニット１');
+      const unit1 = result.data.find((u) => u.Name === "テストユニット１");
       expect(unit1).toBeDefined();
       if (!unit1) return;
 
-      expect(unit1.Nickname).toBe('テストユニット１');
-      expect(unit1.KanaName).toBe('てすとゆにっと');
-      expect(unit1.UnitClass).toBe('ロボット');
+      // Unit properties
+      expect(unit1.Nickname).toBe("テストユニット１");
+      expect(unit1.KanaName).toBe("てすとゆにっと");
+      expect(unit1.UnitClass).toBe("ロボット");
       expect(unit1.PilotCapacity).toBe(1);
       expect(unit1.NumItemSlots).toBe(2);
-      expect(unit1.MovementType).toBe('陸');
+      expect(unit1.MovementType).toBe("陸");
       expect(unit1.Speed).toBe(4);
-      expect(unit1.Size).toBe('M');
+      expect(unit1.Size).toBe("M");
       expect(unit1.Cost).toBe(3500);
       expect(unit1.ExpValue).toBe(90);
       expect(unit1.HP).toBe(3400);
       expect(unit1.EN).toBe(110);
       expect(unit1.Armor).toBe(1200);
       expect(unit1.Mobility).toBe(85);
-      expect(unit1.Adaptation).toBe('AABA');
-      expect(unit1.Bitmap).toBe('test_unit1.bmp');
+      expect(unit1.Adaptation).toBe("AABA");
+      expect(unit1.Bitmap).toBe("test_unit1.bmp");
 
-      // Weapons
+      // Features - test all properties
+      expect(unit1.Features.length).toBe(2);
+
+      const feature1 = unit1.Features[0];
+      expect(feature1.Name).toBe("シールド");
+      expect(feature1.Level).toBe(3);
+      expect(feature1.Parameters).toContain("強化シールド");
+      expect(feature1.RequiredCondition).toBe("");
+      expect(feature1.RequiredSkill).toBe("");
+
+      const feature2 = unit1.Features[1];
+      expect(feature2.Name).toBe("分身");
+      expect(feature2.Level).toBe(2);
+      expect(feature2.RequiredCondition).toBe("");
+      expect(feature2.RequiredSkill).toBe("");
+
+      // Weapons - test all properties
       expect(unit1.Weapons.length).toBe(3);
-      expect(unit1.Weapons[0].Name).toBe('ビームライフル');
-      expect(unit1.Weapons[0].AttackPower).toBe(1600);
-      expect(unit1.Weapons[0].Traits).toBe('Ｂ');
 
-      expect(unit1.Weapons[2].Name).toBe('ミサイル');
-      expect(unit1.Weapons[2].Ammo).toBe(6);
-      expect(unit1.Weapons[2].Traits).toBe('Ｍ投L1Ｐ実');
+      // Weapon 1: ビームライフル
+      const weapon1 = unit1.Weapons[0];
+      expect(weapon1.Name).toBe("ビームライフル");
+      expect(weapon1.AttackPower).toBe(1600);
+      expect(weapon1.MinRange).toBe(2);
+      expect(weapon1.MaxRange).toBe(4);
+      expect(weapon1.AccuracyMod).toBe(-10);
+      expect(weapon1.Ammo).toBe(0); // "-" means 0
+      expect(weapon1.ENCost).toBe(30);
+      expect(weapon1.RequiredMorale).toBe(0); // "-" means 0
+      expect(weapon1.Adaptation).toBe("AA-A");
+      expect(weapon1.CriticalMod).toBe(10);
+      expect(weapon1.Traits).toBe("Ｂ");
+      expect(weapon1.RequiredCondition).toBe("");
+      expect(weapon1.RequiredSkill).toBe("");
 
-      // Abilities
+      // Weapon 2: ビームサーベル
+      const weapon2 = unit1.Weapons[1];
+      expect(weapon2.Name).toBe("ビームサーベル");
+      expect(weapon2.AttackPower).toBe(1350);
+      expect(weapon2.MinRange).toBe(1);
+      expect(weapon2.MaxRange).toBe(1);
+      expect(weapon2.AccuracyMod).toBe(19);
+      expect(weapon2.Ammo).toBe(0);
+      expect(weapon2.ENCost).toBe(0);
+      expect(weapon2.RequiredMorale).toBe(105);
+      expect(weapon2.Adaptation).toBe("AAAA");
+      expect(weapon2.CriticalMod).toBe(5);
+      expect(weapon2.Traits).toBe("武");
+      expect(weapon2.RequiredCondition).toBe("");
+      expect(weapon2.RequiredSkill).toBe("");
+
+      // Weapon 3: ミサイル
+      const weapon3 = unit1.Weapons[2];
+      expect(weapon3.Name).toBe("ミサイル");
+      expect(weapon3.AttackPower).toBe(1400);
+      expect(weapon3.MinRange).toBe(1);
+      expect(weapon3.MaxRange).toBe(3);
+      expect(weapon3.AccuracyMod).toBe(5);
+      expect(weapon3.Ammo).toBe(6);
+      expect(weapon3.ENCost).toBe(20);
+      expect(weapon3.RequiredMorale).toBe(0);
+      expect(weapon3.Adaptation).toBe("AAAA");
+      expect(weapon3.CriticalMod).toBe(-10);
+      expect(weapon3.Traits).toBe("Ｍ投L1Ｐ実");
+      expect(weapon3.RequiredCondition).toBe("");
+      expect(weapon3.RequiredSkill).toBe("");
+
+      // Abilities - test all properties
       expect(unit1.Abilities.length).toBe(2);
-      expect(unit1.Abilities[0].Name).toBe('修理装置');
-      expect(unit1.Abilities[1].Name).toBe('補給装置');
+
+      // Ability 1: 修理装置
+      const ability1 = unit1.Abilities[0];
+      expect(ability1.Name).toBe("修理装置");
+      expect(ability1.MinRange).toBe(0);
+      expect(ability1.MaxRange).toBe(1);
+      expect(ability1.Stock).toBe(5);
+      expect(ability1.ENCost).toBe(0);
+      expect(ability1.RequiredMorale).toBe(0);
+      expect(ability1.Traits).toBe("");
+      expect(ability1.RequiredCondition).toBe("");
+      expect(ability1.RequiredSkill).toBe("");
+      expect(ability1.Effects.length).toBeGreaterThan(0);
+      expect(ability1.Effects[0].EffectType).toBe("回復");
+      expect(ability1.Effects[0].EffectLevel).toBe(3);
+
+      // Ability 2: 補給装置
+      const ability2 = unit1.Abilities[1];
+      expect(ability2.Name).toBe("補給装置");
+      expect(ability2.MinRange).toBe(0);
+      expect(ability2.MaxRange).toBe(1);
+      expect(ability2.Stock).toBe(3);
+      expect(ability2.ENCost).toBe(0);
+      expect(ability2.RequiredMorale).toBe(105);
+      expect(ability2.Traits).toBe("");
+      expect(ability2.RequiredCondition).toBe("");
+      expect(ability2.RequiredSkill).toBe("");
+      expect(ability2.Effects.length).toBeGreaterThan(0);
+      expect(ability2.Effects[0].EffectType).toBe("補給");
     });
 
-    it('should parse human unit with parentheses in class', () => {
+    // Test2
+    it("Test2: should parse human unit with parentheses in class", () => {
       const result = parseUnitFile(sampleUnitText);
 
       if (!result.success) {
-        fail(`Parse failed: ${result.error.message}`);
+        throw new Error(`Parse failed: ${result.error.message}`);
       }
 
-      const humanUnit = result.data.find((u) => u.Name === '人間ユニット');
+      const humanUnit = result.data.find((u) => u.Name === "人間ユニット");
       expect(humanUnit).toBeDefined();
       if (!humanUnit) return;
 
-      expect(humanUnit.Nickname).toBe('戦士');
-      expect(humanUnit.KanaName).toBe('戦士'); // No kana specified, should default to nickname
-      expect(humanUnit.UnitClass).toBe('(戦士)');
-      expect(humanUnit.Size).toBe('SS');
+      expect(humanUnit.Nickname).toBe("戦士");
+      expect(humanUnit.KanaName).toBe("戦士"); // No kana specified, should default to nickname
+      expect(humanUnit.UnitClass).toBe("(戦士)");
+      expect(humanUnit.Size).toBe("SS");
 
       expect(humanUnit.Weapons.length).toBe(2);
-      expect(humanUnit.Weapons[0].Name).toBe('剣');
-      expect(humanUnit.Weapons[1].Name).toBe('弓');
+      expect(humanUnit.Weapons[0].Name).toBe("剣");
+      expect(humanUnit.Weapons[1].Name).toBe("弓");
       expect(humanUnit.Weapons[1].Ammo).toBe(12);
     });
 
-    it('should parse unit with no abilities', () => {
+    // Test3
+    it("Test3: should parse unit with no features", () => {
       const result = parseUnitFile(sampleUnitText);
 
       if (!result.success) {
-        fail(`Parse failed: ${result.error.message}`);
+        throw new Error(`Parse failed: ${result.error.message}`);
       }
 
-      const simpleUnit = result.data.find((u) => u.Name === 'シンプルユニット');
+      const simpleUnit = result.data.find((u) => u.Name === "シンプルユニット");
       expect(simpleUnit).toBeDefined();
       if (!simpleUnit) return;
 
@@ -106,14 +220,15 @@ describe('Unit Parser', () => {
       expect(simpleUnit.Abilities.length).toBe(0);
     });
 
-    it('should parse minimal unit with no weapons and no abilities', () => {
+    // Test4
+    it("Test4: should parse minimal unit with no weapons and no abilities", () => {
       const result = parseUnitFile(sampleUnitText);
 
       if (!result.success) {
-        fail(`Parse failed: ${result.error.message}`);
+        throw new Error(`Parse failed: ${result.error.message}`);
       }
 
-      const minimalUnit = result.data.find((u) => u.Name === '最小ユニット');
+      const minimalUnit = result.data.find((u) => u.Name === "最小ユニット");
       expect(minimalUnit).toBeDefined();
       if (!minimalUnit) return;
 
@@ -121,60 +236,400 @@ describe('Unit Parser', () => {
       expect(minimalUnit.Abilities.length).toBe(0);
     });
 
-    it('should parse unit with multiple movement types', () => {
+    // Test5
+    it("Test5: should parse unit with multiple movement types", () => {
       const result = parseUnitFile(sampleUnitText);
 
       if (!result.success) {
-        fail(`Parse failed: ${result.error.message}`);
+        throw new Error(`Parse failed: ${result.error.message}`);
       }
 
-      const multiUnit = result.data.find((u) => u.Name === '複合ユニット');
+      const multiUnit = result.data.find((u) => u.Name === "複合ユニット");
       expect(multiUnit).toBeDefined();
       if (!multiUnit) return;
 
-      expect(multiUnit.MovementType).toBe('空陸水');
+      expect(multiUnit.MovementType).toBe("空陸水");
     });
 
-    it('should handle line continuation with underscore', () => {
+    // Test6
+    it("Test6: should handle line continuation with underscore (Test 6 - weapons)", () => {
       const result = parseUnitFile(sampleUnitText);
 
       if (!result.success) {
-        fail(`Parse failed: ${result.error.message}`);
+        throw new Error(`Parse failed: ${result.error.message}`);
       }
 
-      const longUnit = result.data.find((u) => u.Name === '長名称ユニット');
+      const longUnit = result.data.find((u) => u.Name === "長名称ユニット");
       expect(longUnit).toBeDefined();
       if (!longUnit) return;
 
       // Weapon with multiline traits
       const longRangeWeapon = longUnit.Weapons.find(
-        (w) => w.Name === '超長射程ビーム砲'
+        (w) => w.Name === "超長射程ビーム砲"
       );
       expect(longRangeWeapon).toBeDefined();
       if (!longRangeWeapon) return;
 
-      expect(longRangeWeapon.Traits).toBe('ＢＰＨ有');
+      expect(longRangeWeapon.Traits).toBe("ＢＰＨ有");
     });
 
-    it('should parse all test units successfully', () => {
+    // Test7
+    it("Test7: should parse special ability with description (解説) definition", () => {
       const result = parseUnitFile(sampleUnitText);
 
       if (!result.success) {
-        fail(`Parse failed: ${result.error.message}`);
+        throw new Error(`Parse failed: ${result.error.message}`);
       }
 
-      // Expect 8 units in the fixture
-      expect(result.data.length).toBe(8);
+      const unit = result.data.find((u) => u.Name === "解説ユニット");
+      expect(unit).toBeDefined();
+      if (!unit) return;
 
-      const unitNames = result.data.map((u) => u.Name);
-      expect(unitNames).toContain('テストユニット１');
-      expect(unitNames).toContain('人間ユニット');
-      expect(unitNames).toContain('シンプルユニット');
-      expect(unitNames).toContain('最小ユニット');
-      expect(unitNames).toContain('複合ユニット');
-      expect(unitNames).toContain('長名称ユニット');
-      expect(unitNames).toContain('解説ユニット');
-      expect(unitNames).toContain('改行なし');
+      // Unit basic properties
+      expect(unit.Nickname).toBe("解説テスト");
+      expect(unit.UnitClass).toBe("説明機");
+
+      // Should have 2 features: custom ability and its description definition
+      expect(unit.Features.length).toBe(2);
+
+      // Custom ability with alias
+      const customFeature = unit.Features.find(
+        (f) => f.Name === "カスタム能力" || f.Parameters.includes("特殊スキル")
+      );
+      expect(customFeature).toBeDefined();
+      if (customFeature) {
+        expect(customFeature.Level).toBe(3);
+        expect(customFeature.Parameters).toContain("特殊スキル");
+      }
+
+      // Description definition: 特殊スキル=解説 特別な訓練により習得した独自の戦闘技術
+      const descDefinition = unit.Features.find(
+        (f) => f.Name === "特殊スキル" && f.Parameters.includes("解説")
+      );
+      expect(descDefinition).toBeDefined();
+      if (descDefinition) {
+        expect(descDefinition.Parameters).toContain("解説");
+        expect(descDefinition.Parameters).toContain(
+          "特別な訓練により習得した独自の戦闘技術"
+        );
+      }
+
+      // Weapon
+      expect(unit.Weapons.length).toBe(1);
+      const weapon = unit.Weapons[0];
+      expect(weapon.Name).toBe("標準武器");
+      expect(weapon.AttackPower).toBe(1200);
+      expect(weapon.MinRange).toBe(1);
+      expect(weapon.MaxRange).toBe(2);
+      expect(weapon.ENCost).toBe(25);
+    });
+
+    // Test8
+    it("Test8: should handle line continuation with underscore in feature (Test 8)", () => {
+      const result = parseUnitFile(sampleUnitText);
+
+      if (!result.success) {
+        throw new Error(`Parse failed: ${result.error.message}`);
+      }
+
+      const unit = result.data.find((u) => u.Name === "改行テスト");
+      expect(unit).toBeDefined();
+      if (!unit) return;
+
+      expect(unit.Features.length).toBe(1);
+      const feature = unit.Features[0];
+      expect(feature.Name).toBe("超回避");
+      expect(feature.Level).toBe(5);
+      // The parameters should contain the continuation of the line
+      expect(feature.Parameters).toContain("残像");
+      expect(feature.Parameters).toContain("気力140以上で発動");
+    });
+
+    // Test9
+    it("Test9: should parse multiple abilities in one line", () => {
+      const result = parseUnitFile(sampleUnitText);
+
+      if (!result.success) {
+        throw new Error(`Parse failed: ${result.error.message}`);
+      }
+
+      const unit = result.data.find((u) => u.Name === "複数能力１行");
+      expect(unit).toBeDefined();
+      if (!unit) return;
+
+      expect(unit.Features.length).toBe(2);
+      const feature1 = unit.Features.find((f) => f.Name === "霊力変換器");
+      const feature2 = unit.Features.find((f) => f.Name === "ＨＰ回復");
+      expect(feature1).toBeDefined();
+      expect(feature2).toBeDefined();
+      if (feature1) expect(feature1.Level).toBe(100);
+      if (feature2) expect(feature2.Level).toBe(2);
+    });
+
+    // Test10
+    it("Test10: should parse negative and zero level abilities", () => {
+      const result = parseUnitFile(sampleUnitText);
+
+      if (!result.success) {
+        throw new Error(`Parse failed: ${result.error.message}`);
+      }
+
+      const unit = result.data.find((u) => u.Name === "レベル指定");
+      expect(unit).toBeDefined();
+      if (!unit) return;
+
+      expect(unit.Features.length).toBe(2);
+      const feature1 = unit.Features.find((f) => f.Name === "ＨＰ回復");
+      const feature2 = unit.Features.find((f) => f.Name === "ＥＮ回復");
+      expect(feature1).toBeDefined();
+      expect(feature2).toBeDefined();
+      if (feature1) expect(feature1.Level).toBe(-1);
+      if (feature2) expect(feature2.Level).toBe(0);
+    });
+
+    // Test11
+    it("Test11: should parse hidden ability and space-separated options", () => {
+      const result = parseUnitFile(sampleUnitText);
+
+      if (!result.success) {
+        throw new Error(`Parse failed: ${result.error.message}`);
+      }
+
+      const unit = result.data.find((u) => u.Name === "非表示・オプション");
+      expect(unit).toBeDefined();
+      if (!unit) return;
+
+      expect(unit.Features.length).toBe(2);
+      const hiddenFeature = unit.Features.find((f) => f.Name === "ホバー移動");
+      const barrierFeature = unit.Features.find((f) => f.Name === "バリア");
+      expect(hiddenFeature).toBeDefined();
+      expect(barrierFeature).toBeDefined();
+      if (hiddenFeature) expect(hiddenFeature.Parameters).toContain("非表示");
+      if (barrierFeature) {
+        expect(barrierFeature.Level).toBe(1);
+        expect(barrierFeature.Parameters).toContain("念動バリア");
+        expect(barrierFeature.Parameters).toContain("全");
+        expect(barrierFeature.Parameters).toContain("10");
+      }
+    });
+
+    // Test12
+    it("Test12: should parse dummy abilities with various formats including quoted comma", () => {
+      const result = parseUnitFile(sampleUnitText);
+
+      if (!result.success) {
+        throw new Error(`Parse failed: ${result.error.message}`);
+      }
+
+      const unit = result.data.find((u) => u.Name === "ダミー能力");
+      expect(unit).toBeDefined();
+      if (!unit) return;
+
+      expect(unit.Features.length).toBe(5);
+
+      // カスタム能力 with alias
+      const customFeature = unit.Features.find((f) =>
+        f.Parameters.includes("特殊スキル")
+      );
+      expect(customFeature).toBeDefined();
+
+      // Dummy ability 1: Basic format
+      const dummy1 = unit.Features.find((f) =>
+        f.Parameters.includes("風の聖霊シルフ")
+      );
+      expect(dummy1).toBeDefined();
+      if (dummy1) {
+        expect(dummy1.Parameters).toContain(
+          "風の属性を持つ攻撃に対して耐性を持つ"
+        );
+      }
+
+      // Dummy ability 2: With quoted comma (exact match test)
+      const dummy2 = unit.Features.find((f) =>
+        f.Parameters.includes("水の聖霊ウンディーネ")
+      );
+      expect(dummy2).toBeDefined();
+      if (dummy2) {
+        expect(dummy2.Parameters).toBe(
+          "水の聖霊ウンディーネ 水の属性を持つ攻撃に対して耐性を持ち、火系攻撃に弱い"
+        );
+      }
+
+      // Dummy ability 3: With comma in description (exact match test)
+      const dummy3 = unit.Features.find((f) =>
+        f.Parameters.includes("大地の聖霊ノーム")
+      );
+      expect(dummy3).toBeDefined();
+      if (dummy3) {
+        expect(dummy3.Parameters).toBe(
+          "大地の聖霊ノーム 大地, 土, 岩の属性に強く, 風系攻撃に弱い"
+        );
+      }
+
+      // Description override
+      const descOverride = unit.Features.find(
+        (f) => f.Name === "特殊スキル" && f.Parameters.includes("解説")
+      );
+      expect(descOverride).toBeDefined();
+      if (descOverride) {
+        expect(descOverride.Parameters).toContain(
+          "特別な訓練により習得した独自の戦闘技術"
+        );
+      }
+    });
+
+    // Test13
+    it("Test13: should parse required skills and conditions for abilities", () => {
+      const result = parseUnitFile(sampleUnitText);
+
+      if (!result.success) {
+        throw new Error(`Parse failed: ${result.error.message}`);
+      }
+
+      const unit = result.data.find((u) => u.Name === "必要技能テスト");
+      expect(unit).toBeDefined();
+      if (!unit) return;
+
+      expect(unit.Features.length).toBe(3);
+
+      // Required skill only: バリアLv2=念動バリア 全 10 (念力Lv3)
+      const barrierFeature = unit.Features.find((f) => f.Name === "バリア");
+      expect(barrierFeature).toBeDefined();
+      if (barrierFeature) {
+        expect(barrierFeature.RequiredSkill).toBe("念力Lv3");
+        expect(barrierFeature.RequiredCondition).toBe("");
+      }
+
+      // Required condition only: ステルス=狩人 <@森 or @林>
+      const stealthFeature = unit.Features.find((f) => f.Name === "ステルス");
+      expect(stealthFeature).toBeDefined();
+      if (stealthFeature) {
+        expect(stealthFeature.RequiredSkill).toBe("");
+        expect(stealthFeature.RequiredCondition).toBe("@森 or @林");
+      }
+
+      // Both: ＺＯＣ=砂地獄 <地上> (土遁の術Lv4)
+      const zocFeature = unit.Features.find((f) => f.Name === "ＺＯＣ");
+      expect(zocFeature).toBeDefined();
+      if (zocFeature) {
+        expect(zocFeature.RequiredCondition).toBe("地上");
+        expect(zocFeature.RequiredSkill).toBe("土遁の術Lv4");
+      }
+    });
+
+    // Test14
+    it("Test14: should parse required skills and conditions for weapons", () => {
+      const result = parseUnitFile(sampleUnitText);
+
+      if (!result.success) {
+        throw new Error(`Parse failed: ${result.error.message}`);
+      }
+
+      const unit = result.data.find((u) => u.Name === "武器条件テスト");
+      expect(unit).toBeDefined();
+      if (!unit) return;
+
+      expect(unit.Weapons.length).toBe(3);
+
+      // Required skill only: 念動斬り
+      const weapon1 = unit.Weapons.find((w) => w.Name === "念動斬り");
+      expect(weapon1).toBeDefined();
+      if (weapon1) {
+        expect(weapon1.RequiredSkill).toBe("念力Lv3");
+        expect(weapon1.RequiredCondition).toBe("");
+      }
+
+      // Required condition only: ドリルアタック
+      const weapon2 = unit.Weapons.find((w) => w.Name === "ドリルアタック");
+      expect(weapon2).toBeDefined();
+      if (weapon2) {
+        expect(weapon2.RequiredSkill).toBe("");
+        expect(weapon2.RequiredCondition).toBe("母艦3マス以内");
+      }
+
+      // Both: 森林剣
+      const weapon3 = unit.Weapons.find((w) => w.Name === "森林剣");
+      expect(weapon3).toBeDefined();
+      if (weapon3) {
+        expect(weapon3.RequiredCondition).toBe("@森 or @林");
+        expect(weapon3.RequiredSkill).toBe("剣技Lv2");
+      }
+    });
+
+    // Test15
+    it("Test15: should parse required skills and conditions for unit abilities", () => {
+      const result = parseUnitFile(sampleUnitText);
+
+      if (!result.success) {
+        throw new Error(`Parse failed: ${result.error.message}`);
+      }
+
+      const unit = result.data.find((u) => u.Name === "アビリティ条件テスト");
+      expect(unit).toBeDefined();
+      if (!unit) return;
+
+      expect(unit.Abilities.length).toBe(3);
+
+      // Required skill only: 癒しの光
+      const ability1 = unit.Abilities.find((a) => a.Name === "癒しの光");
+      expect(ability1).toBeDefined();
+      if (ability1) {
+        expect(ability1.RequiredSkill).toBe("術Lv3");
+        expect(ability1.RequiredCondition).toBe("");
+      }
+
+      // Required condition only: 森林浴
+      const ability2 = unit.Abilities.find((a) => a.Name === "森林浴");
+      expect(ability2).toBeDefined();
+      if (ability2) {
+        expect(ability2.RequiredSkill).toBe("");
+        expect(ability2.RequiredCondition).toBe("@森 or @林");
+      }
+
+      // Both: 森のカーニバル
+      const ability3 = unit.Abilities.find((a) => a.Name === "森のカーニバル");
+      expect(ability3).toBeDefined();
+      if (ability3) {
+        expect(ability3.RequiredCondition).toBe("@森 or @林");
+        expect(ability3.RequiredSkill).toBe("術Lv4");
+      }
+    });
+
+    // Test16
+    it("Test16: should parse complex condition expressions", () => {
+      const result = parseUnitFile(sampleUnitText);
+
+      if (!result.success) {
+        throw new Error(`Parse failed: ${result.error.message}`);
+      }
+
+      const unit = result.data.find((u) => u.Name === "複雑条件");
+      expect(unit).toBeDefined();
+      if (!unit) return;
+
+      expect(unit.Features.length).toBe(2);
+
+      // 地形適応 with multiple terrain names
+      const terrainFeature = unit.Features.find((f) => f.Name === "地形適応");
+      expect(terrainFeature).toBeDefined();
+      if (terrainFeature) {
+        expect(terrainFeature.Parameters).toContain("森林戦仕様");
+      }
+
+      // 追加移動力 with complex condition: <@森 or @林 地上>
+      const movementFeature = unit.Features.find(
+        (f) => f.Name === "追加移動力"
+      );
+      expect(movementFeature).toBeDefined();
+      if (movementFeature) {
+        expect(movementFeature.RequiredCondition).toBe("@森 or @林 地上");
+      }
+
+      // Weapon with complex condition
+      expect(unit.Weapons.length).toBe(1);
+      const weapon = unit.Weapons[0];
+      expect(weapon.Name).toBe("森林砲");
+      expect(weapon.RequiredCondition).toBe("@森 or @林 地上");
     });
   });
 });

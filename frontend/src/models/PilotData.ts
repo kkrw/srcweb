@@ -157,7 +157,7 @@ export function createPilotData(params: Partial<PilotData> = {}): PilotData {
     Name: params.Name || "",
     Sex: params.Sex || "",
     PilotClass: params.PilotClass || "",
-    Adaptation: params.Adaptation || "----",
+    Adaptation: params.Adaptation || "AAAA",
     ExpValue: params.ExpValue || 0,
     MeleeAtk: params.MeleeAtk || 0,
     RangedAtk: params.RangedAtk || 0,
