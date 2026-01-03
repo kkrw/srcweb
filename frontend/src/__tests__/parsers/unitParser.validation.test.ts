@@ -453,11 +453,26 @@ describe("Unit Parser - Validation Tests", () => {
         const unit = result.data.find((u) => u.Name === "全地形適応");
         expect(unit).toBeDefined();
         if (unit) {
-          expect(unit.Adaptation).toMatch(/[-EDCBAS]/);
+          expect(unit.Adaptation.air).toBe(0); // Valid rank value check
+          expect(unit.Adaptation.ground).toBe(1); // Valid rank value check
+          expect(unit.Adaptation.water).toBe(2); // Valid rank value check
+          expect(unit.Adaptation.space).toBe(3); // Valid rank value check
           if (unit.Weapons.length > 0) {
-            unit.Weapons.forEach((weapon) => {
-              expect(weapon.Adaptation).toMatch(/[-EDCBAS]/);
-            });
+            // BAS-
+            expect(unit.Weapons[0].Adaptation.air).toBe(4);
+            expect(unit.Weapons[0].Adaptation.ground).toBe(5);
+            expect(unit.Weapons[0].Adaptation.water).toBe(6);
+            expect(unit.Weapons[0].Adaptation.space).toBe(0);
+            // EDCB
+            expect(unit.Weapons[1].Adaptation.air).toBe(1);
+            expect(unit.Weapons[1].Adaptation.ground).toBe(2);
+            expect(unit.Weapons[1].Adaptation.water).toBe(3);
+            expect(unit.Weapons[1].Adaptation.space).toBe(4);
+            // ASDC
+            expect(unit.Weapons[2].Adaptation.air).toBe(5);
+            expect(unit.Weapons[2].Adaptation.ground).toBe(6);
+            expect(unit.Weapons[2].Adaptation.water).toBe(2);
+            expect(unit.Weapons[2].Adaptation.space).toBe(3);
           }
         }
       }
@@ -493,8 +508,9 @@ describe("Unit Parser - Validation Tests", () => {
             expect(weapon.RequiredMorale).toBe(111); // 110.5 → 111
             expect(weapon.CriticalMod).toBe(11); // +10.5 → 11
             // "気L1.4" is stored in Traits (not RequiredSkill, as it's not in parentheses)
-            expect(weapon.Traits).toBe("気L1.4");
-            expect(weapon.RequiredSkill).toBe("");
+            expect(weapon.Traits).toHaveLength(1);
+            expect(weapon.Traits[0].code).toBe("気L1.4");
+            expect(weapon.RequiredSkill).toHaveLength(0);
           }
 
           // Ability integer fields
@@ -506,8 +522,9 @@ describe("Unit Parser - Validation Tests", () => {
             expect(ability.ENCost).toBe(51); // 50.7 → 51
             expect(ability.RequiredMorale).toBe(120); // 120.1 → 120
             // "気L1.4" is stored in Traits (not RequiredSkill)
-            expect(ability.Traits).toBe("気L1.4");
-            expect(ability.RequiredSkill).toBe("");
+            expect(ability.Traits).toHaveLength(1);
+            expect(ability.Traits[0].code).toBe("気L1.4");
+            expect(ability.RequiredSkill).toHaveLength(0);
           }
         }
       }
@@ -521,64 +538,100 @@ describe("Unit Parser - Validation Tests", () => {
 
       // Unit field warnings (now using actual file line numbers with new implementation)
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数値: 移動力に実数値が指定されたため、整数に変換されました（4.5 → 5）。 (行83)")
+        expect.stringContaining(
+          "実数値: 移動力に実数値が指定されたため、整数に変換されました（4.5 → 5）。 (行83)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数値: 修理費に実数値が指定されたため、整数に変換されました（2000.5 → 2001）。 (行83)")
+        expect.stringContaining(
+          "実数値: 修理費に実数値が指定されたため、整数に変換されました（2000.5 → 2001）。 (行83)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数値: 経験値に実数値が指定されたため、整数に変換されました（50.5 → 51）。 (行83)")
+        expect.stringContaining(
+          "実数値: 経験値に実数値が指定されたため、整数に変換されました（50.5 → 51）。 (行83)"
+        )
       );
 
       // Unit stats warnings
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数値: HPに実数値が指定されたため、整数に変換されました（2000.5 → 2001）。 (行87)")
+        expect.stringContaining(
+          "実数値: HPに実数値が指定されたため、整数に変換されました（2000.5 → 2001）。 (行87)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数値: ENに実数値が指定されたため、整数に変換されました（100.7 → 101）。 (行87)")
+        expect.stringContaining(
+          "実数値: ENに実数値が指定されたため、整数に変換されました（100.7 → 101）。 (行87)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数値: 装甲に実数値が指定されたため、整数に変換されました（800.3 → 800）。 (行87)")
+        expect.stringContaining(
+          "実数値: 装甲に実数値が指定されたため、整数に変換されました（800.3 → 800）。 (行87)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数値: 運動性に実数値が指定されたため、整数に変換されました（80.9 → 81）。 (行87)")
+        expect.stringContaining(
+          "実数値: 運動性に実数値が指定されたため、整数に変換されました（80.9 → 81）。 (行87)"
+        )
       );
 
       // Weapon field warnings
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数武器の攻撃力に実数値が指定されたため、整数に変換されました（1000.4 → 1000）。 (行89)")
+        expect.stringContaining(
+          "実数武器の攻撃力に実数値が指定されたため、整数に変換されました（1000.4 → 1000）。 (行89)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数武器の最小射程に実数値が指定されたため、整数に変換されました（1.5 → 2）。 (行89)")
+        expect.stringContaining(
+          "実数武器の最小射程に実数値が指定されたため、整数に変換されました（1.5 → 2）。 (行89)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数武器の最大射程に実数値が指定されたため、整数に変換されました（1.5 → 2）。 (行89)")
+        expect.stringContaining(
+          "実数武器の最大射程に実数値が指定されたため、整数に変換されました（1.5 → 2）。 (行89)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数武器の弾数に実数値が指定されたため、整数に変換されました（10.6 → 11）。 (行89)")
+        expect.stringContaining(
+          "実数武器の弾数に実数値が指定されたため、整数に変換されました（10.6 → 11）。 (行89)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数武器の消費ENに実数値が指定されたため、整数に変換されました（30.2 → 30）。 (行89)")
+        expect.stringContaining(
+          "実数武器の消費ENに実数値が指定されたため、整数に変換されました（30.2 → 30）。 (行89)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数武器の必要気力に実数値が指定されたため、整数に変換されました（110.5 → 111）。 (行89)")
+        expect.stringContaining(
+          "実数武器の必要気力に実数値が指定されたため、整数に変換されました（110.5 → 111）。 (行89)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数武器のクリティカル率に実数値が指定されたため、整数に変換されました（+10.5 → 11）。 (行89)")
+        expect.stringContaining(
+          "実数武器のクリティカル率に実数値が指定されたため、整数に変換されました（+10.5 → 11）。 (行89)"
+        )
       );
 
       // Ability field warnings
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数アビリティの射程に実数値が指定されたため、整数に変換されました（5.8 → 6）。 (行91)")
+        expect.stringContaining(
+          "実数アビリティの射程に実数値が指定されたため、整数に変換されました（5.8 → 6）。 (行91)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数アビリティの回数に実数値が指定されたため、整数に変換されました（10.3 → 10）。 (行91)")
+        expect.stringContaining(
+          "実数アビリティの回数に実数値が指定されたため、整数に変換されました（10.3 → 10）。 (行91)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数アビリティの消費ENに実数値が指定されたため、整数に変換されました（50.7 → 51）。 (行91)")
+        expect.stringContaining(
+          "実数アビリティの消費ENに実数値が指定されたため、整数に変換されました（50.7 → 51）。 (行91)"
+        )
       );
       expect(result.warnings).toContainEqual(
-        expect.stringContaining("実数アビリティの必要気力に実数値が指定されたため、整数に変換されました（120.1 → 120）。 (行91)")
+        expect.stringContaining(
+          "実数アビリティの必要気力に実数値が指定されたため、整数に変換されました（120.1 → 120）。 (行91)"
+        )
       );
     });
 
@@ -612,7 +665,9 @@ describe("Unit Parser - Validation Tests", () => {
           expect(ability.Effects).toBeDefined();
           expect(ability.Effects.length).toBeGreaterThan(0);
 
-          const healEffect = ability.Effects.find((e) => e.EffectType === "回復");
+          const healEffect = ability.Effects.find(
+            (e) => e.EffectType === "回復"
+          );
           if (healEffect) {
             expect(healEffect.EffectLevel).toBe(2.8); // 回復Lv2.8
           }
@@ -620,15 +675,19 @@ describe("Unit Parser - Validation Tests", () => {
 
         // "気L1.4" level in Traits is stored as-is as a string, not parsed as number
         const weapon = unit.Weapons[0];
-        expect(weapon.Traits).toBe("気L1.4");
+        expect(weapon.Traits).toHaveLength(1);
+        expect(weapon.Traits[0].code).toBe("気L1.4");
 
         const ability = unit.Abilities[0];
-        expect(ability.Traits).toBe("気L1.4");
+        expect(ability.Traits).toHaveLength(1);
+        expect(ability.Traits[0].code).toBe("気L1.4");
 
         // NO warnings should be generated for Feature.Level or AbilityEffect.EffectLevel
         const floatFieldWarnings = result.warnings?.filter(
           (w) =>
-            (w.includes("シールド") || w.includes("ＨＰ回復") || w.includes("回復Lv")) &&
+            (w.includes("シールド") ||
+              w.includes("ＨＰ回復") ||
+              w.includes("回復Lv")) &&
             w.includes("実数値が指定されたため")
         );
         expect(floatFieldWarnings?.length || 0).toBe(0);
@@ -711,11 +770,15 @@ describe("Unit Parser - Validation Tests", () => {
           // AbilityEffect.EffectLevel should keep .5 as float
           if (unit.Abilities.length > 0) {
             const ability = unit.Abilities[0];
-            const addEffect = ability.Effects.find((e) => e.EffectType === "付加");
+            const addEffect = ability.Effects.find(
+              (e) => e.EffectType === "付加"
+            );
             if (addEffect) {
               expect(addEffect.EffectLevel).toBe(1.5);
             }
-            const healEffect = ability.Effects.find((e) => e.EffectType === "回復");
+            const healEffect = ability.Effects.find(
+              (e) => e.EffectType === "回復"
+            );
             if (healEffect) {
               expect(healEffect.EffectLevel).toBe(1.5);
             }
@@ -760,7 +823,9 @@ describe("Unit Parser - Validation Tests", () => {
           // AbilityEffect.EffectLevel can be negative decimal
           if (unit.Abilities.length > 0) {
             const ability = unit.Abilities[0];
-            const addEffect = ability.Effects.find((e) => e.EffectType === "付加");
+            const addEffect = ability.Effects.find(
+              (e) => e.EffectType === "付加"
+            );
             if (addEffect) {
               expect(addEffect.EffectLevel).toBe(-1.2);
             }
@@ -769,16 +834,22 @@ describe("Unit Parser - Validation Tests", () => {
 
         // Verify warnings for negative integer field decimals
         expect(result.warnings).toContainEqual(
-          expect.stringContaining("負実数武器の命中率に実数値が指定されたため、整数に変換されました（-15.7 → -16）。 (行115)")
+          expect.stringContaining(
+            "負実数武器の命中率に実数値が指定されたため、整数に変換されました（-15.7 → -16）。 (行115)"
+          )
         );
         expect(result.warnings).toContainEqual(
-          expect.stringContaining("負実数武器のクリティカル率に実数値が指定されたため、整数に変換されました（-20.3 → -20）。 (行115)")
+          expect.stringContaining(
+            "負実数武器のクリティカル率に実数値が指定されたため、整数に変換されました（-20.3 → -20）。 (行115)"
+          )
         );
 
         // NO warnings for Feature.Level or AbilityEffect.EffectLevel with negative decimals
         const negativeFloatWarnings = result.warnings?.filter(
           (w) =>
-            (w.includes("ＨＰ回復") || w.includes("ＥＮ回復") || w.includes("付加")) &&
+            (w.includes("ＨＰ回復") ||
+              w.includes("ＥＮ回復") ||
+              w.includes("付加")) &&
             w.includes("実数値が指定されたため")
         );
         expect(negativeFloatWarnings?.length || 0).toBe(0);

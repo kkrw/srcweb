@@ -53,7 +53,9 @@ export const UNIT_SIZES = ["XL", "LL", "L", "M", "S", "SS"] as const;
 export const DEFAULTS = {
   SIZE: "M",
   ADAPTATION: "AAAA",
+  ADAPTATION_SINGLE: "A",
   BITMAP: "-.bmp",
+  UNIT_CLASS: "汎用",
 } as const;
 
 /**

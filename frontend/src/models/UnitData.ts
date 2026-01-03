@@ -1,6 +1,8 @@
-import type { FeatureData } from "./FeatureData";
-import type { WeaponData } from "./WeaponData";
 import type { AbilityData } from "./AbilityData";
+import { type Integer } from "./BrandedTypes";
+import type { FeatureData } from "./FeatureData";
+import { Adaptation } from "./interpreter/Adaptation";
+import type { WeaponData } from "./WeaponData";
 
 /**
  * ユニット（Unit）のデータモデル
@@ -18,7 +20,7 @@ export interface UnitData {
    * 数値型のID
    * UnitDataList で管理される際の連番
    */
-  ID: number;
+  ID: Integer;
 
   /**
    * ユニットの分類（系譜やタイプ）
@@ -29,29 +31,28 @@ export interface UnitData {
    * パイロット数
    * 負の値の場合は括弧付きの指定（固定パイロット等）を意味する特殊な仕様があります
    */
-  PilotCapacity: number;
+  PilotCapacity: Integer;
 
   /**
    * 装備可能な強化パーツのスロット数
    */
-  NumItemSlots: number;
+  NumItemSlots: Integer;
 
   /**
-   * 地形適応（4文字の文字列）
-   * 形式: "AAAA" (左から空・陸・水・宇)
-   * ランク: S, A, B, C, - など
+   * 地形適応 (Air, Ground, Water, Space)
+   * 形式: "AAAA" -> 空・陸・水・宇
    */
-  Adaptation: string;
+  Adaptation: Adaptation;
 
   /**
    * 耐久力の最大値（基本値）
    */
-  HP: number;
+  HP: Integer;
 
   /**
    * エネルギーの最大値（基本値）
    */
-  EN: number;
+  EN: Integer;
 
   /**
    * 移動タイプ
@@ -62,7 +63,7 @@ export interface UnitData {
   /**
    * 移動力の基本値
    */
-  Speed: number;
+  Speed: Integer;
 
   /**
    * サイズ区分
@@ -73,24 +74,24 @@ export interface UnitData {
   /**
    * 装甲値の基本値
    */
-  Armor: number;
+  Armor: Integer;
 
   /**
    * 運動性の基本値
    */
-  Mobility: number;
+  Mobility: Integer;
 
   /**
    * 修理費
    * 撃墜された際の修理費、および獲得資金の基礎値
    */
-  Cost: number;
+  Cost: Integer;
 
   /**
    * 経験値
    * 撃墜時に得られる経験値の基礎値
    */
-  ExpValue: number;
+  ExpValue: Integer;
 
   /**
    * 愛称
@@ -142,20 +143,20 @@ export interface UnitData {
 export function createUnitData(params: Partial<UnitData> = {}): UnitData {
   return {
     Name: params.Name || "",
-    ID: params.ID || 0,
+    ID: params.ID || (0 as Integer),
     UnitClass: params.UnitClass || "",
-    PilotCapacity: params.PilotCapacity || 1,
-    NumItemSlots: params.NumItemSlots || 0,
-    Adaptation: params.Adaptation || "AAAA",
-    HP: params.HP || 0,
-    EN: params.EN || 0,
+    PilotCapacity: params.PilotCapacity || (1 as Integer),
+    NumItemSlots: params.NumItemSlots || (0 as Integer),
+    Adaptation: params.Adaptation || Adaptation.fromString("AAAA"),
+    HP: params.HP || (0 as Integer),
+    EN: params.EN || (0 as Integer),
     MovementType: params.MovementType || "",
-    Speed: params.Speed || 0,
+    Speed: params.Speed || (0 as Integer),
     Size: params.Size || "M",
-    Armor: params.Armor || 0,
-    Mobility: params.Mobility || 0,
-    Cost: params.Cost || 0,
-    ExpValue: params.ExpValue || 0,
+    Armor: params.Armor || (0 as Integer),
+    Mobility: params.Mobility || (0 as Integer),
+    Cost: params.Cost || (0 as Integer),
+    ExpValue: params.ExpValue || (0 as Integer),
     Nickname: params.Nickname || "",
     KanaName: params.KanaName || "",
     Bitmap: params.Bitmap || "",
@@ -164,6 +165,21 @@ export function createUnitData(params: Partial<UnitData> = {}): UnitData {
     Weapons: params.Weapons || [],
     Abilities: params.Abilities || [],
   };
+}
+
+/**
+ * 文字列データから UnitData を生成するためのヘルパー関数
+ */
+export function parseUnitData(
+  rawData: Partial<UnitData> & { Adaptation?: string | Adaptation }
+): UnitData {
+  return createUnitData({
+    ...rawData,
+    Adaptation:
+      typeof rawData.Adaptation === "string"
+        ? Adaptation.fromString(rawData.Adaptation)
+        : rawData.Adaptation,
+  });
 }
 
 /**

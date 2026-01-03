@@ -1,8 +1,9 @@
-import type { FeatureData } from "./FeatureData";
-import type { WeaponData } from "./WeaponData";
 import type { AbilityData } from "./AbilityData";
-import type { SpecialPower } from "./SpecialPower";
+import { type Integer } from "./BrandedTypes";
+import type { FeatureData } from "./FeatureData";
 import type { SkillData } from "./SkillData";
+import type { SpecialPower } from "./SpecialPower";
+import type { WeaponData } from "./WeaponData";
 
 /**
  * パイロット（Pilot）のデータモデル
@@ -40,43 +41,43 @@ export interface PilotData {
    * 経験値
    * 撃墜時に敵が得られる経験値の基礎値
    */
-  ExpValue: number;
+  ExpValue: Integer;
 
   /**
    * 格闘攻撃力
    * 格闘攻撃の威力や命中率に影響するパラメータ
    */
-  MeleeAtk: number;
+  MeleeAtk: Integer;
 
   /**
    * 射撃攻撃力
    * 射撃攻撃の威力や命中率に影響するパラメータ
    */
-  RangedAtk: number;
+  RangedAtk: Integer;
 
   /**
    * 命中
    * 攻撃の命中率に影響するパラメータ
    */
-  Accuracy: number;
+  Accuracy: Integer;
 
   /**
    * 回避
    * 攻撃の回避率に影響するパラメータ
    */
-  Evasion: number;
+  Evasion: Integer;
 
   /**
    * 敏捷性（反応）
    * 回避率や行動順序に影響するパラメータ
    */
-  Agility: number;
+  Agility: Integer;
 
   /**
    * 技量
    * クリティカル率や特殊技能の発動率に影響するパラメータ
    */
-  Technique: number;
+  Technique: Integer;
 
   /**
    * 性格
@@ -88,7 +89,7 @@ export interface PilotData {
   /**
    * 精神ポイント（MPに相当）の最大値（初期値）
    */
-  SP: number;
+  SP: Integer;
 
   /**
    * 戦闘時に再生される専用BGMのファイル名
@@ -158,15 +159,15 @@ export function createPilotData(params: Partial<PilotData> = {}): PilotData {
     Sex: params.Sex || "",
     PilotClass: params.PilotClass || "",
     Adaptation: params.Adaptation || "AAAA",
-    ExpValue: params.ExpValue || 0,
-    MeleeAtk: params.MeleeAtk || 0,
-    RangedAtk: params.RangedAtk || 0,
-    Accuracy: params.Accuracy || 0,
-    Evasion: params.Evasion || 0,
-    Agility: params.Agility || 0,
-    Technique: params.Technique || 0,
+    ExpValue: params.ExpValue || (0 as Integer),
+    MeleeAtk: params.MeleeAtk || (0 as Integer),
+    RangedAtk: params.RangedAtk || (0 as Integer),
+    Accuracy: params.Accuracy || (0 as Integer),
+    Evasion: params.Evasion || (0 as Integer),
+    Agility: params.Agility || (0 as Integer),
+    Technique: params.Technique || (0 as Integer),
     Personality: params.Personality || "",
-    SP: params.SP || 0,
+    SP: params.SP || (0 as Integer),
     BGM: params.BGM || "",
     Nickname: params.Nickname || "",
     KanaName: params.KanaName || "",

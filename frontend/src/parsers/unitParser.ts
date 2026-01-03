@@ -4,14 +4,21 @@
  * Parses unit.txt / robot.txt files in SRC format
  */
 
-import type {
-  AbilityData,
-  AbilityEffect,
-  FeatureData,
-  UnitData,
-  WeaponData,
+import {
+  toFloat,
+  type AbilityData,
+  type AbilityEffect,
+  type FeatureData,
+  type Float,
+  type Integer,
+  type UnitData,
+  type WeaponData,
 } from "../models";
 import { DEFAULT_LEVEL } from "../models/FeatureData";
+import { Adaptation } from "../models/interpreter/Adaptation";
+import { parseCondition } from "../models/interpreter/Condition";
+import { parseSkillRequirement } from "../models/interpreter/SkillRequirement";
+import { parseTraits } from "../models/interpreter/Trait";
 import { createUnitData } from "../models/UnitData";
 import {
   ABILITY_LIMITS,
@@ -22,15 +29,13 @@ import {
 } from "./constants";
 import { ERROR_MESSAGES, warningSummary } from "./messages";
 import type { ParseResult } from "./ParseResult";
-import type { PreprocessedLine, LogicalLineResult } from "./utils";
+import type { LogicalLineResult, PreprocessedLine } from "./utils";
 import {
   findFieldLineNumber,
   getLogicalLine,
-  isNoValue,
   isNumericString,
   ParseError,
   parseIntField,
-  parseFloatField,
   parseOptionalIntField,
   preprocessLines,
   splitByComma,
@@ -78,7 +83,7 @@ function validateSize(size: string): { value: string; warning?: string } {
  * Parses a single feature definition string
  * Based on VB5 UnitData.cls AddFeature method (lines 151-307)
  *
- * @param featureText - Feature definition string (e.g., "変形Lv3=ガンダム <地上> (ニュータイプLv2)")
+ * @param featureText - Feature definition string (e.g., "変形Lv3=ドラゴン <地上> (術Lv2)")
  * @returns FeatureData object
  */
 function parseFeature(featureText: string): FeatureData {
@@ -135,11 +140,11 @@ function parseFeature(featureText: string): FeatureData {
   // 4. Split into 4 patterns
   if (validLvIndex > 0 && eqIndex > 0) {
     // Pattern 1: Both "Lv" and "=" exist
-    // Example: "変形Lv3=ガンダム"
+    // Example: "変形Lv3=ドラゴン"
     ftype = buf.substring(0, validLvIndex).trim();
 
     const levelStr = buf.substring(validLvIndex + 2, eqIndex).trim();
-    flevel = parseFloat(levelStr);
+    flevel = parseFloat(levelStr) as Float;
     if (isNaN(flevel)) {
       flevel = DEFAULT_LEVEL;
     }
@@ -151,13 +156,13 @@ function parseFeature(featureText: string): FeatureData {
     ftype = buf.substring(0, validLvIndex).trim();
 
     const levelStr = buf.substring(validLvIndex + 2).trim();
-    flevel = parseFloat(levelStr);
+    flevel = parseFloat(levelStr) as Float;
     if (isNaN(flevel)) {
       flevel = DEFAULT_LEVEL;
     }
   } else if (eqIndex > 0) {
     // Pattern 3: Only "=" exists
-    // Example: "変形=ガンダム"
+    // Example: "変形=ドラゴン"
     ftype = buf.substring(0, eqIndex).trim();
     fdata = buf.substring(eqIndex + 1).trim();
   } else {
@@ -174,8 +179,8 @@ function parseFeature(featureText: string): FeatureData {
     Name: ftype,
     Level: flevel,
     Parameters: fdata,
-    RequiredSkill: requiredSkill,
-    RequiredCondition: requiredCondition,
+    RequiredSkill: parseSkillRequirement(requiredSkill),
+    RequiredCondition: parseCondition(requiredCondition),
   };
 }
 
@@ -205,7 +210,10 @@ function parseFeaturesNewFormat(
     const fields = splitByComma(logicalLine.content);
 
     // Check if this is the HP/EN/Armor/Mobility line (4 numeric fields)
-    if (fields.length === 4 && fields.every((f) => !isNaN(parseIntField(f).value))) {
+    if (
+      fields.length === 4 &&
+      fields.every((f) => !isNaN(parseIntField(f).value))
+    ) {
       // This is the stats line, stop parsing features
       break;
     }
@@ -369,7 +377,8 @@ function parseUnitData(
 
     // Line 1: Name
     if (lineIndex >= lines.length) {
-      const lastLineNum = lines.length > 0 ? lines[lines.length - 1].lineNumber : 1;
+      const lastLineNum =
+        lines.length > 0 ? lines[lines.length - 1].lineNumber : 1;
       throw new ParseError(ERROR_MESSAGES.UNEXPECTED_EOF, lastLineNum, "");
     }
     const nameLogicalLine = getLogicalLine(lines, lineIndex);
@@ -384,7 +393,11 @@ function parseUnitData(
 
     // Line 2: Nickname, [KanaName,] UnitClass, PilotCapacity, NumItemSlots
     if (lineIndex >= lines.length) {
-      throw new ParseError(ERROR_MESSAGES.MISSING_UNIT_PARAMS, nameLogicalLine.endLineNumber, "");
+      throw new ParseError(
+        ERROR_MESSAGES.MISSING_UNIT_PARAMS,
+        nameLogicalLine.endLineNumber,
+        ""
+      );
     }
     const paramsLogicalLine = getLogicalLine(lines, lineIndex);
     const params = splitByComma(paramsLogicalLine.content);
@@ -409,40 +422,48 @@ function parseUnitData(
     const nickname = params[0];
     let kanaName: string;
     let unitClass: string;
-    let pilotCapacity: number;
-    let numItemSlots: number;
+    let pilotCapacity: Integer;
+    let numItemSlots: Integer;
 
     if (params.length === 4) {
       // No KanaName specified
       kanaName = "";
       unitClass = params[1];
       const pilotResult = parseIntField(params[2], "パイロット数");
-      pilotCapacity = pilotResult.value;
+      pilotCapacity = pilotResult.value as Integer;
       if (pilotResult.warning) {
         const lineNumber = findFieldLineNumber(lines, paramsLogicalLine, 2);
-        warnings.push(`[${filePath}] ${name}: ${pilotResult.warning} (行${lineNumber})`);
+        warnings.push(
+          `[${filePath}] ${name}: ${pilotResult.warning} (行${lineNumber})`
+        );
       }
       const itemResult = parseIntField(params[3], "アイテム数");
-      numItemSlots = itemResult.value;
+      numItemSlots = itemResult.value as Integer;
       if (itemResult.warning) {
         const lineNumber = findFieldLineNumber(lines, paramsLogicalLine, 3);
-        warnings.push(`[${filePath}] ${name}: ${itemResult.warning} (行${lineNumber})`);
+        warnings.push(
+          `[${filePath}] ${name}: ${itemResult.warning} (行${lineNumber})`
+        );
       }
     } else if (params.length >= 5) {
       // KanaName specified
       kanaName = params[1];
       unitClass = params[2];
       const pilotResult = parseIntField(params[3], "パイロット数");
-      pilotCapacity = pilotResult.value;
+      pilotCapacity = pilotResult.value as Integer;
       if (pilotResult.warning) {
         const lineNumber = findFieldLineNumber(lines, paramsLogicalLine, 3);
-        warnings.push(`[${filePath}] ${name}: ${pilotResult.warning} (行${lineNumber})`);
+        warnings.push(
+          `[${filePath}] ${name}: ${pilotResult.warning} (行${lineNumber})`
+        );
       }
       const itemResult = parseIntField(params[4], "アイテム数");
-      numItemSlots = itemResult.value;
+      numItemSlots = itemResult.value as Integer;
       if (itemResult.warning) {
         const lineNumber = findFieldLineNumber(lines, paramsLogicalLine, 4);
-        warnings.push(`[${filePath}] ${name}: ${itemResult.warning} (行${lineNumber})`);
+        warnings.push(
+          `[${filePath}] ${name}: ${itemResult.warning} (行${lineNumber})`
+        );
       }
     } else {
       throw new ParseError(
@@ -455,11 +476,15 @@ function parseUnitData(
     // Validate unit class (should not be numeric)
     if (isNumericString(unitClass)) {
       const unitClassIndex = params.length === 4 ? 1 : 2;
-      const lineNumber = findFieldLineNumber(lines, paramsLogicalLine, unitClassIndex);
+      const lineNumber = findFieldLineNumber(
+        lines,
+        paramsLogicalLine,
+        unitClassIndex
+      );
       warnings.push(
         `[${filePath}] ${name}: ユニットクラスの設定が間違っています。 (行${lineNumber})`
       );
-      unitClass = "汎用";
+      unitClass = DEFAULTS.UNIT_CLASS;
     }
 
     // Handle parentheses in PilotCapacity (special behavior)
@@ -467,11 +492,17 @@ function parseUnitData(
       // This is a complex case, for now just parse the number
       const numStr = params[params.length - 2].replaceAll(`"`, "");
       const result = parseIntField(numStr, "パイロット数");
-      pilotCapacity = -Math.abs(result.value); // Negative indicates special behavior
+      pilotCapacity = -Math.abs(result.value) as Integer; // Negative indicates special behavior
       if (result.warning) {
         const pilotFieldIndex = params.length - 2;
-        const lineNumber = findFieldLineNumber(lines, paramsLogicalLine, pilotFieldIndex);
-        warnings.push(`[${filePath}] ${name}: ${result.warning} (行${lineNumber})`);
+        const lineNumber = findFieldLineNumber(
+          lines,
+          paramsLogicalLine,
+          pilotFieldIndex
+        );
+        warnings.push(
+          `[${filePath}] ${name}: ${result.warning} (行${lineNumber})`
+        );
       }
     }
 
@@ -483,10 +514,14 @@ function parseUnitData(
         UNIT_LIMITS.PILOT_CAPACITY.MAX,
         "パイロット数"
       );
-      pilotCapacity = pilotResult.value;
+      pilotCapacity = pilotResult.value as Integer;
       if (pilotResult.warning) {
         const pilotFieldIndex = params.length === 4 ? 2 : 3;
-        const lineNumber = findFieldLineNumber(lines, paramsLogicalLine, pilotFieldIndex);
+        const lineNumber = findFieldLineNumber(
+          lines,
+          paramsLogicalLine,
+          pilotFieldIndex
+        );
         warnings.push(
           `[${filePath}] ${name}: ${pilotResult.warning} (行${lineNumber})`
         );
@@ -498,10 +533,14 @@ function parseUnitData(
         UNIT_LIMITS.PILOT_CAPACITY.MAX,
         "パイロット数"
       );
-      pilotCapacity = -pilotResult.value;
+      pilotCapacity = -pilotResult.value as Integer;
       if (pilotResult.warning) {
         const pilotFieldIndex = params.length === 4 ? 2 : 3;
-        const lineNumber = findFieldLineNumber(lines, paramsLogicalLine, pilotFieldIndex);
+        const lineNumber = findFieldLineNumber(
+          lines,
+          paramsLogicalLine,
+          pilotFieldIndex
+        );
         warnings.push(
           `[${filePath}] ${name}: ${pilotResult.warning} (行${lineNumber})`
         );
@@ -515,10 +554,14 @@ function parseUnitData(
       UNIT_LIMITS.ITEM_SLOTS.MAX,
       "アイテム数"
     );
-    numItemSlots = itemSlotResult.value;
+    numItemSlots = itemSlotResult.value as Integer;
     if (itemSlotResult.warning) {
       const itemFieldIndex = params.length === 4 ? 3 : 4;
-      const lineNumber = findFieldLineNumber(lines, paramsLogicalLine, itemFieldIndex);
+      const lineNumber = findFieldLineNumber(
+        lines,
+        paramsLogicalLine,
+        itemFieldIndex
+      );
       warnings.push(
         `[${filePath}] ${name}: ${itemSlotResult.warning} (行${lineNumber})`
       );
@@ -547,26 +590,32 @@ function parseUnitData(
     const movementType = movementParams[0];
 
     const speedResult = parseIntField(movementParams[1], "移動力");
-    let speed = speedResult.value;
+    let speed = speedResult.value as Integer;
     if (speedResult.warning) {
       const lineNumber = findFieldLineNumber(lines, movementLogicalLine, 1);
-      warnings.push(`[${filePath}] ${name}: ${speedResult.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${name}: ${speedResult.warning} (行${lineNumber})`
+      );
     }
 
     let size = movementParams[2];
 
     const costParse = parseIntField(movementParams[3], "修理費");
-    let cost = costParse.value;
+    let cost = costParse.value as Integer;
     if (costParse.warning) {
       const lineNumber = findFieldLineNumber(lines, movementLogicalLine, 3);
-      warnings.push(`[${filePath}] ${name}: ${costParse.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${name}: ${costParse.warning} (行${lineNumber})`
+      );
     }
 
     const expParse = parseIntField(movementParams[4], "経験値");
-    let expValue = expParse.value;
+    let expValue = expParse.value as Integer;
     if (expParse.warning) {
       const lineNumber = findFieldLineNumber(lines, movementLogicalLine, 4);
-      warnings.push(`[${filePath}] ${name}: ${expParse.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${name}: ${expParse.warning} (行${lineNumber})`
+      );
     }
 
     // Validate speed
@@ -576,7 +625,7 @@ function parseUnitData(
       UNIT_LIMITS.SPEED.MAX,
       "移動力"
     );
-    speed = speedValidation.value;
+    speed = speedValidation.value as Integer;
     if (speedValidation.warning) {
       const lineNumber = findFieldLineNumber(lines, movementLogicalLine, 1);
       warnings.push(
@@ -601,7 +650,7 @@ function parseUnitData(
       UNIT_LIMITS.COST.MAX,
       "修理費"
     );
-    cost = costResult.value;
+    cost = costResult.value as Integer;
     if (costResult.warning) {
       const lineNumber = findFieldLineNumber(lines, movementLogicalLine, 3);
       warnings.push(
@@ -616,7 +665,7 @@ function parseUnitData(
       UNIT_LIMITS.EXP_VALUE.MAX,
       "経験値"
     );
-    expValue = expResult.value;
+    expValue = expResult.value as Integer;
     if (expResult.warning) {
       const lineNumber = findFieldLineNumber(lines, movementLogicalLine, 4);
       warnings.push(
@@ -685,41 +734,49 @@ function parseUnitData(
     }
 
     const hpParseResult = parseIntField(stats[0], "HP");
-    let hp = hpParseResult.value;
+    let hp = hpParseResult.value as Integer;
     if (hpParseResult.warning) {
       const lineNumber = findFieldLineNumber(lines, statsLogicalLine, 0);
-      warnings.push(`[${filePath}] ${name}: ${hpParseResult.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${name}: ${hpParseResult.warning} (行${lineNumber})`
+      );
     }
 
     const enParseResult = parseIntField(stats[1], "EN");
-    let en = enParseResult.value;
+    let en = enParseResult.value as Integer;
     if (enParseResult.warning) {
       const lineNumber = findFieldLineNumber(lines, statsLogicalLine, 1);
-      warnings.push(`[${filePath}] ${name}: ${enParseResult.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${name}: ${enParseResult.warning} (行${lineNumber})`
+      );
     }
 
     const armorParseResult = parseIntField(stats[2], "装甲");
-    let armor = armorParseResult.value;
+    let armor = armorParseResult.value as Integer;
     if (armorParseResult.warning) {
       const lineNumber = findFieldLineNumber(lines, statsLogicalLine, 2);
-      warnings.push(`[${filePath}] ${name}: ${armorParseResult.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${name}: ${armorParseResult.warning} (行${lineNumber})`
+      );
     }
 
     const mobilityParseResult = parseIntField(stats[3], "運動性");
-    let mobility = mobilityParseResult.value;
+    let mobility = mobilityParseResult.value as Integer;
     if (mobilityParseResult.warning) {
       const lineNumber = findFieldLineNumber(lines, statsLogicalLine, 3);
-      warnings.push(`[${filePath}] ${name}: ${mobilityParseResult.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${name}: ${mobilityParseResult.warning} (行${lineNumber})`
+      );
     }
 
-    // Validate HP
+    // Validarte HP
     const hpResult = validateRange(
       hp,
       UNIT_LIMITS.HP.MIN,
       UNIT_LIMITS.HP.MAX,
       "最大HP"
     );
-    hp = hpResult.value;
+    hp = hpResult.value as Integer;
     if (hpResult.warning) {
       const lineNumber = findFieldLineNumber(lines, statsLogicalLine, 0);
       warnings.push(
@@ -734,7 +791,7 @@ function parseUnitData(
       UNIT_LIMITS.EN.MAX,
       "最大EN"
     );
-    en = enResult.value;
+    en = enResult.value as Integer;
     if (enResult.warning) {
       const lineNumber = findFieldLineNumber(lines, statsLogicalLine, 1);
       warnings.push(
@@ -749,7 +806,7 @@ function parseUnitData(
       UNIT_LIMITS.ARMOR.MAX,
       "装甲"
     );
-    armor = armorResult.value;
+    armor = armorResult.value as Integer;
     if (armorResult.warning) {
       const lineNumber = findFieldLineNumber(lines, statsLogicalLine, 2);
       warnings.push(
@@ -764,7 +821,7 @@ function parseUnitData(
       UNIT_LIMITS.MOBILITY.MAX,
       "運動性"
     );
-    mobility = mobilityResult.value;
+    mobility = mobilityResult.value as Integer;
     if (mobilityResult.warning) {
       const lineNumber = findFieldLineNumber(lines, statsLogicalLine, 3);
       warnings.push(
@@ -881,7 +938,7 @@ function parseUnitData(
       EN: en,
       Armor: armor,
       Mobility: mobility,
-      Adaptation: adaptation,
+      Adaptation: Adaptation.fromString(adaptation),
       Bitmap: bitmap,
       Features: features,
       Weapons: weapons,
@@ -925,61 +982,75 @@ function parseWeapon(
     const name = fields[0];
 
     const attackPowerResult = parseIntField(fields[1], `${name}の攻撃力`);
-    let attackPower = attackPowerResult.value;
+    let attackPower = attackPowerResult.value as Integer;
     if (attackPowerResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 1);
-      warnings.push(`[${filePath}] ${attackPowerResult.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${attackPowerResult.warning} (行${lineNumber})`
+      );
     }
 
     const minRangeParse = parseIntField(fields[2], `${name}の最小射程`);
-    let minRange = minRangeParse.value;
+    let minRange = minRangeParse.value as Integer;
     if (minRangeParse.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 2);
       warnings.push(`[${filePath}] ${minRangeParse.warning} (行${lineNumber})`);
     }
 
     const maxRangeParse = parseIntField(fields[3], `${name}の最大射程`);
-    let maxRange = maxRangeParse.value;
+    let maxRange = maxRangeParse.value as Integer;
     if (maxRangeParse.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 3);
       warnings.push(`[${filePath}] ${maxRangeParse.warning} (行${lineNumber})`);
     }
 
     const accuracyModResult = parseIntField(fields[4], `${name}の命中率`);
-    let accuracyMod = accuracyModResult.value;
+    let accuracyMod = accuracyModResult.value as Integer;
     if (accuracyModResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 4);
-      warnings.push(`[${filePath}] ${accuracyModResult.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${accuracyModResult.warning} (行${lineNumber})`
+      );
     }
 
     const ammoParse = parseOptionalIntField(fields[5], `${name}の弾数`);
-    let ammo = ammoParse.value;
+    let ammo = ammoParse.value as Integer;
     if (ammoParse.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 5);
       warnings.push(`[${filePath}] ${ammoParse.warning} (行${lineNumber})`);
     }
 
     const enCostParse = parseOptionalIntField(fields[6], `${name}の消費EN`);
-    let enCost = enCostParse.value;
+    let enCost = enCostParse.value as Integer;
     if (enCostParse.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 6);
       warnings.push(`[${filePath}] ${enCostParse.warning} (行${lineNumber})`);
     }
 
-    const requiredMoraleParse = parseOptionalIntField(fields[7], `${name}の必要気力`);
-    let requiredMorale = requiredMoraleParse.value;
+    const requiredMoraleParse = parseOptionalIntField(
+      fields[7],
+      `${name}の必要気力`
+    );
+    let requiredMorale = requiredMoraleParse.value as Integer;
     if (requiredMoraleParse.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 7);
-      warnings.push(`[${filePath}] ${requiredMoraleParse.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${requiredMoraleParse.warning} (行${lineNumber})`
+      );
     }
 
     let adaptation = fields[8];
 
-    const criticalModResult = parseIntField(fields[9], `${name}のクリティカル率`);
-    let criticalMod = criticalModResult.value;
+    const criticalModResult = parseIntField(
+      fields[9],
+      `${name}のクリティカル率`
+    );
+    let criticalMod = criticalModResult.value as Integer;
     if (criticalModResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 9);
-      warnings.push(`[${filePath}] ${criticalModResult.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${criticalModResult.warning} (行${lineNumber})`
+      );
     }
 
     let traits = fields[10] || "";
@@ -991,7 +1062,7 @@ function parseWeapon(
       WEAPON_LIMITS.ATTACK_POWER.MAX,
       "攻撃力"
     );
-    attackPower = powerResult.value;
+    attackPower = powerResult.value as Integer;
     if (powerResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 1);
       warnings.push(
@@ -1006,7 +1077,7 @@ function parseWeapon(
       WEAPON_LIMITS.MIN_RANGE.MAX,
       "最小射程"
     );
-    minRange = minRangeResult.value;
+    minRange = minRangeResult.value as Integer;
     if (minRangeResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 2);
       warnings.push(
@@ -1020,7 +1091,7 @@ function parseWeapon(
       WEAPON_LIMITS.MAX_RANGE.MAX,
       "最大射程"
     );
-    maxRange = maxRangeResult.value;
+    maxRange = maxRangeResult.value as Integer;
     if (maxRangeResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 3);
       warnings.push(
@@ -1035,7 +1106,7 @@ function parseWeapon(
       WEAPON_LIMITS.ACCURACY_MOD.MAX,
       "命中率"
     );
-    accuracyMod = accuracyResult.value;
+    accuracyMod = accuracyResult.value as Integer;
     if (accuracyResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 4);
       warnings.push(
@@ -1050,7 +1121,7 @@ function parseWeapon(
       WEAPON_LIMITS.AMMO.MAX,
       "弾数"
     );
-    ammo = ammoResult.value;
+    ammo = ammoResult.value as Integer;
     if (ammoResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 5);
       warnings.push(
@@ -1065,7 +1136,7 @@ function parseWeapon(
       WEAPON_LIMITS.EN_COST.MAX,
       "消費EN"
     );
-    enCost = enResult.value;
+    enCost = enResult.value as Integer;
     if (enResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 6);
       warnings.push(
@@ -1080,7 +1151,7 @@ function parseWeapon(
       WEAPON_LIMITS.REQUIRED_MORALE.MAX,
       "必要気力"
     );
-    requiredMorale = moraleResult.value;
+    requiredMorale = moraleResult.value as Integer;
     if (moraleResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 7);
       warnings.push(
@@ -1105,7 +1176,7 @@ function parseWeapon(
       WEAPON_LIMITS.CRITICAL_MOD.MAX,
       "クリティカル率"
     );
-    criticalMod = criticalResult.value;
+    criticalMod = criticalResult.value as Integer;
     if (criticalResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 9);
       warnings.push(
@@ -1174,11 +1245,11 @@ function parseWeapon(
       Ammo: ammo,
       ENCost: enCost,
       RequiredMorale: requiredMorale,
-      Adaptation: adaptation,
+      Adaptation: Adaptation.fromString(adaptation),
       CriticalMod: criticalMod,
-      Traits: traits,
-      RequiredCondition: requiredCondition,
-      RequiredSkill: requiredSkill,
+      Traits: parseTraits(traits),
+      RequiredCondition: parseCondition(requiredCondition),
+      RequiredSkill: parseSkillRequirement(requiredSkill),
     };
 
     return {
@@ -1330,7 +1401,7 @@ function parseAbilityEffects(effectString: string): AbilityEffect[] {
 
     effects.push({
       EffectType: effectType,
-      EffectLevel: effectLevel,
+      EffectLevel: toFloat(effectLevel),
       EffectData: effectData,
     });
   }
@@ -1366,31 +1437,38 @@ function parseAbility(
     const effectString = fields[1];
 
     const maxRangeResult = parseIntField(fields[2], `${name}の射程`);
-    let maxRange = maxRangeResult.value;
+    let maxRange = maxRangeResult.value as Integer;
     if (maxRangeResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 2);
-      warnings.push(`[${filePath}] ${maxRangeResult.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${maxRangeResult.warning} (行${lineNumber})`
+      );
     }
 
     const stockParse = parseOptionalIntField(fields[3], `${name}の回数`);
-    let stock = stockParse.value;
+    let stock = stockParse.value as Integer;
     if (stockParse.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 3);
       warnings.push(`[${filePath}] ${stockParse.warning} (行${lineNumber})`);
     }
 
     const enCostParse = parseOptionalIntField(fields[4], `${name}の消費EN`);
-    let enCost = enCostParse.value;
+    let enCost = enCostParse.value as Integer;
     if (enCostParse.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 4);
       warnings.push(`[${filePath}] ${enCostParse.warning} (行${lineNumber})`);
     }
 
-    const requiredMoraleParse = parseOptionalIntField(fields[5], `${name}の必要気力`);
-    let requiredMorale = requiredMoraleParse.value;
+    const requiredMoraleParse = parseOptionalIntField(
+      fields[5],
+      `${name}の必要気力`
+    );
+    let requiredMorale = requiredMoraleParse.value as Integer;
     if (requiredMoraleParse.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 5);
-      warnings.push(`[${filePath}] ${requiredMoraleParse.warning} (行${lineNumber})`);
+      warnings.push(
+        `[${filePath}] ${requiredMoraleParse.warning} (行${lineNumber})`
+      );
     }
 
     let traits = fields[6] || "";
@@ -1402,7 +1480,7 @@ function parseAbility(
       ABILITY_LIMITS.MAX_RANGE.MAX,
       "射程"
     );
-    maxRange = rangeResult.value;
+    maxRange = rangeResult.value as Integer;
     if (rangeResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 2);
       warnings.push(
@@ -1417,7 +1495,7 @@ function parseAbility(
       ABILITY_LIMITS.STOCK.MAX,
       "回数"
     );
-    stock = stockResult.value;
+    stock = stockResult.value as Integer;
     if (stockResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 3);
       warnings.push(
@@ -1432,7 +1510,7 @@ function parseAbility(
       ABILITY_LIMITS.EN_COST.MAX,
       "消費EN"
     );
-    enCost = enResult.value;
+    enCost = enResult.value as Integer;
     if (enResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 4);
       warnings.push(
@@ -1447,7 +1525,7 @@ function parseAbility(
       ABILITY_LIMITS.REQUIRED_MORALE.MAX,
       "必要気力"
     );
-    requiredMorale = moraleResult.value;
+    requiredMorale = moraleResult.value as Integer;
     if (moraleResult.warning) {
       const lineNumber = findFieldLineNumber(lines, logicalLine, 5);
       warnings.push(
@@ -1520,11 +1598,11 @@ function parseAbility(
       Stock: stock,
       ENCost: enCost,
       RequiredMorale: requiredMorale,
-      MinRange: 0,
+      MinRange: 0 as Integer,
       MaxRange: maxRange,
-      Traits: traits,
-      RequiredSkill: requiredSkill,
-      RequiredCondition: requiredCondition,
+      Traits: parseTraits(traits),
+      RequiredSkill: parseSkillRequirement(requiredSkill),
+      RequiredCondition: parseCondition(requiredCondition),
       Effects: effects,
     };
 

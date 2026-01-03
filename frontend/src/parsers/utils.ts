@@ -4,7 +4,7 @@
  * Common utilities for parsing Shift-JIS encoded text files
  */
 
-import Encoding from 'encoding-japanese';
+import Encoding from "encoding-japanese";
 
 /**
  * Decodes Shift-JIS buffer to UTF-8 string
@@ -17,8 +17,8 @@ export function decodeShiftJIS(buffer: ArrayBuffer): string {
 
   // Convert to Unicode
   const unicodeArray = Encoding.convert(uint8Array, {
-    to: 'UNICODE',
-    from: detectedEncoding || 'SJIS',
+    to: "UNICODE",
+    from: detectedEncoding || "SJIS",
   });
 
   // Convert to string
@@ -54,7 +54,7 @@ export function preprocessLines(text: string): PreprocessedLine[] {
     const lineNumber = i + 1; // 1-based
 
     // Remove inline comments (//)
-    const commentIndex = line.indexOf('//');
+    const commentIndex = line.indexOf("//");
     if (commentIndex !== -1) {
       line = line.substring(0, commentIndex);
     }
@@ -68,12 +68,12 @@ export function preprocessLines(text: string): PreprocessedLine[] {
     }
 
     // Skip comment lines (starting with #)
-    if (line.startsWith('#')) {
+    if (line.startsWith("#")) {
       continue;
     }
 
     // Check for line continuation
-    const isContinuation = line.endsWith('_');
+    const isContinuation = line.endsWith("_");
     if (isContinuation) {
       // Remove _ and trailing spaces
       line = line.substring(0, line.length - 1).trimEnd();
@@ -149,7 +149,7 @@ export function getLogicalLine(
  */
 export function splitByComma(line: string): string[] {
   const fields: string[] = [];
-  let currentField = '';
+  let currentField = "";
   let inQuotes = false;
 
   for (let i = 0; i < line.length; i++) {
@@ -158,9 +158,9 @@ export function splitByComma(line: string): string[] {
     if (char === '"') {
       inQuotes = !inQuotes;
       currentField += char;
-    } else if (char === ',' && !inQuotes) {
+    } else if (char === "," && !inQuotes) {
       fields.push(currentField.trim());
-      currentField = '';
+      currentField = "";
     } else {
       currentField += char;
     }
@@ -192,7 +192,11 @@ export function findFieldLineNumber(
   let inQuotes = false;
 
   // Search only within the logical line's range
-  for (let lineIdx = logicalLine.startIndex; lineIdx <= logicalLine.endIndex; lineIdx++) {
+  for (
+    let lineIdx = logicalLine.startIndex;
+    lineIdx <= logicalLine.endIndex;
+    lineIdx++
+  ) {
     const lineContent = lines[lineIdx].content;
     const lineNumber = lines[lineIdx].lineNumber;
 
@@ -201,7 +205,7 @@ export function findFieldLineNumber(
 
       if (char === '"') {
         inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
+      } else if (char === "," && !inQuotes) {
         // Field boundary found
         if (currentFieldIndex === fieldIndex) {
           // The target field ends on this line
@@ -259,8 +263,11 @@ export interface ParseNumericResult {
  * @param fieldName - Field name for warning messages (optional)
  * @returns Object with parsed value and optional warning
  */
-export function parseIntField(field: string, fieldName?: string): ParseNumericResult {
-  if (field === '-' || field === '') {
+export function parseIntField(
+  field: string,
+  fieldName?: string
+): ParseNumericResult {
+  if (field === "-" || field === "") {
     return { value: 0 };
   }
 
@@ -289,7 +296,7 @@ export function parseIntField(field: string, fieldName?: string): ParseNumericRe
  * @returns Parsed float value
  */
 export function parseFloatField(field: string): number {
-  if (field === '-' || field === '') {
+  if (field === "-" || field === "") {
     return 0;
   }
   const num = parseFloat(field);
@@ -309,7 +316,10 @@ export function parseFloatField(field: string): number {
  * @param fieldName - Field name for warning messages (optional)
  * @returns Object with parsed value and optional warning
  */
-export function parseOptionalIntField(field: string, fieldName?: string): ParseNumericResult {
+export function parseOptionalIntField(
+  field: string,
+  fieldName?: string
+): ParseNumericResult {
   if (isNoValue(field)) {
     return { value: 0 };
   }
@@ -320,7 +330,7 @@ export function parseOptionalIntField(field: string, fieldName?: string): ParseN
  * Checks if a field represents "no value" (-, empty string)
  */
 export function isNoValue(field: string): boolean {
-  return field === '-' || field === '';
+  return field === "-" || field === "";
 }
 
 /**
@@ -346,7 +356,7 @@ export function isNoValue(field: string): boolean {
  * isNumericString("-") // false (hyphen only, handled separately)
  */
 export function isNumericString(field: string): boolean {
-  if (field === '' || field === '-') {
+  if (field === "" || field === "-") {
     return false;
   }
   return !isNaN(Number(field));
@@ -358,7 +368,9 @@ export function isNumericString(field: string): boolean {
 export function parseAdaptation(field: string): string {
   // Should be 4 characters, each one of: S, A, B, C, D, -
   if (field.length !== FORMAT.ADAPTATION_LENGTH) {
-    console.warn(`Invalid adaptation format: "${field}", using default "${DEFAULTS.ADAPTATION}"`);
+    console.warn(
+      `Invalid adaptation format: "${field}", using default "${DEFAULTS.ADAPTATION}"`
+    );
     return DEFAULTS.ADAPTATION;
   }
   return field;
@@ -368,16 +380,20 @@ export function parseAdaptation(field: string): string {
  * Error type for parser errors
  */
 export class ParseError extends Error {
-  public readonly lineNumber: number;  // 1-based line number for display
+  public readonly lineNumber: number; // 1-based line number for display
+  public readonly lineContent: string;
 
   constructor(
     message: string,
-    lineNumber: number,  // 1-based line number
-    public lineContent: string
+    lineNumber: number, // 1-based line number
+    lineContent: string
   ) {
-    super(`Parse error at line ${lineNumber}: ${message}\nLine: ${lineContent}`);
-    this.name = 'ParseError';
+    super(
+      `Parse error at line ${lineNumber}: ${message}\nLine: ${lineContent}`
+    );
+    this.name = "ParseError";
     this.lineNumber = lineNumber;
+    this.lineContent = lineContent;
   }
 }
 
@@ -385,8 +401,7 @@ export class ParseError extends Error {
  * Validation utilities
  */
 
-import { ERROR_MESSAGES } from './messages';
-import { DEFAULTS, FORMAT } from './constants';
+import { DEFAULTS, FORMAT } from "./constants";
 
 /**
  * Validates and clamps a number to a range
@@ -400,7 +415,10 @@ export function validateRange(
   if (value < min || value > max) {
     return {
       value: Math.max(min, Math.min(max, value)),
-      warning: `${fieldName}の値が範囲外です（${min}-${max}）。${Math.max(min, Math.min(max, value))}に設定されました。`,
+      warning: `${fieldName}の値が範囲外です（${min}-${max}）。${Math.max(
+        min,
+        Math.min(max, value)
+      )}に設定されました。`,
     };
   }
   return { value };
@@ -409,7 +427,10 @@ export function validateRange(
 /**
  * Validates adaptation string (4 characters)
  */
-export function validateAdaptation(adaptation: string): { value: string; warning?: string } {
+export function validateAdaptation(adaptation: string): {
+  value: string;
+  warning?: string;
+} {
   if (adaptation.length !== FORMAT.ADAPTATION_LENGTH) {
     return {
       value: DEFAULTS.ADAPTATION,
@@ -422,7 +443,10 @@ export function validateAdaptation(adaptation: string): { value: string; warning
 /**
  * Validates bitmap filename
  */
-export function validateBitmap(bitmap: string): { value: string; warning?: string } {
+export function validateBitmap(bitmap: string): {
+  value: string;
+  warning?: string;
+} {
   if (!bitmap.toLowerCase().endsWith(FORMAT.BITMAP_EXTENSION)) {
     return {
       value: DEFAULTS.BITMAP,
@@ -435,10 +459,12 @@ export function validateBitmap(bitmap: string): { value: string; warning?: strin
 /**
  * Validates that traits don't contain invalid Lv specifications
  */
-export function validateTraits(traits: string, itemName: string): string | null {
-  if (traits.includes('Lv')) {
+export function validateTraits(
+  traits: string,
+  itemName: string
+): string | null {
+  if (traits.includes("Lv")) {
     return `${itemName}の属性のレベル指定が間違っています。`;
   }
   return null;
 }
-

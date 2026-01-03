@@ -6,6 +6,11 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import {
+  AndCondition,
+  AtomCondition,
+  OrCondition,
+} from "../../models/interpreter/Condition";
 import { parseUnitFile } from "../../parsers/unitParser";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -77,7 +82,7 @@ describe("Unit Parser", () => {
       expect(unit1.EN).toBe(110);
       expect(unit1.Armor).toBe(1200);
       expect(unit1.Mobility).toBe(85);
-      expect(unit1.Adaptation).toBe("AABA");
+      expect(unit1.Adaptation.toString()).toBe("AABA");
       expect(unit1.Bitmap).toBe("test_unit1.bmp");
 
       // Features - test all properties
@@ -87,14 +92,20 @@ describe("Unit Parser", () => {
       expect(feature1.Name).toBe("シールド");
       expect(feature1.Level).toBe(3);
       expect(feature1.Parameters).toContain("強化シールド");
-      expect(feature1.RequiredCondition).toBe("");
-      expect(feature1.RequiredSkill).toBe("");
+      expect(feature1.RequiredCondition).toBeInstanceOf(AndCondition); // empty condition default to AndCondition([])
+      expect(
+        (feature1.RequiredCondition as AndCondition)["conditions"]
+      ).toHaveLength(0);
+      expect(feature1.RequiredSkill).toHaveLength(0);
 
       const feature2 = unit1.Features[1];
       expect(feature2.Name).toBe("分身");
       expect(feature2.Level).toBe(2);
-      expect(feature2.RequiredCondition).toBe("");
-      expect(feature2.RequiredSkill).toBe("");
+      expect(feature2.RequiredCondition).toBeInstanceOf(AndCondition);
+      expect(
+        (feature2.RequiredCondition as AndCondition)["conditions"]
+      ).toHaveLength(0);
+      expect(feature2.RequiredSkill).toHaveLength(0);
 
       // Weapons - test all properties
       expect(unit1.Weapons.length).toBe(3);
@@ -109,11 +120,18 @@ describe("Unit Parser", () => {
       expect(weapon1.Ammo).toBe(0); // "-" means 0
       expect(weapon1.ENCost).toBe(30);
       expect(weapon1.RequiredMorale).toBe(0); // "-" means 0
-      expect(weapon1.Adaptation).toBe("AA-A");
+      expect(weapon1.Adaptation.air).toBe(5); // A
+      expect(weapon1.Adaptation.ground).toBe(5); // A
+      expect(weapon1.Adaptation.water).toBe(0); // -
+      expect(weapon1.Adaptation.space).toBe(5); // A
       expect(weapon1.CriticalMod).toBe(10);
-      expect(weapon1.Traits).toBe("Ｂ");
-      expect(weapon1.RequiredCondition).toBe("");
-      expect(weapon1.RequiredSkill).toBe("");
+      expect(weapon1.Traits).toHaveLength(1);
+      expect(weapon1.Traits[0].code).toBe("Ｂ");
+      expect(weapon1.RequiredCondition).toBeInstanceOf(AndCondition);
+      expect(
+        (weapon1.RequiredCondition as AndCondition)["conditions"]
+      ).toHaveLength(0);
+      expect(weapon1.RequiredSkill).toHaveLength(0);
 
       // Weapon 2: ビームサーベル
       const weapon2 = unit1.Weapons[1];
@@ -125,11 +143,18 @@ describe("Unit Parser", () => {
       expect(weapon2.Ammo).toBe(0);
       expect(weapon2.ENCost).toBe(0);
       expect(weapon2.RequiredMorale).toBe(105);
-      expect(weapon2.Adaptation).toBe("AAAA");
+      expect(weapon2.Adaptation.air).toBe(5); // A
+      expect(weapon2.Adaptation.ground).toBe(5); // A
+      expect(weapon2.Adaptation.water).toBe(5); // A
+      expect(weapon2.Adaptation.space).toBe(5); // A
       expect(weapon2.CriticalMod).toBe(5);
-      expect(weapon2.Traits).toBe("武");
-      expect(weapon2.RequiredCondition).toBe("");
-      expect(weapon2.RequiredSkill).toBe("");
+      expect(weapon2.Traits).toHaveLength(1);
+      expect(weapon2.Traits[0].code).toBe("武");
+      expect(weapon2.RequiredCondition).toBeInstanceOf(AndCondition);
+      expect(
+        (weapon2.RequiredCondition as AndCondition)["conditions"]
+      ).toHaveLength(0);
+      expect(weapon2.RequiredSkill).toHaveLength(0);
 
       // Weapon 3: ミサイル
       const weapon3 = unit1.Weapons[2];
@@ -141,11 +166,22 @@ describe("Unit Parser", () => {
       expect(weapon3.Ammo).toBe(6);
       expect(weapon3.ENCost).toBe(20);
       expect(weapon3.RequiredMorale).toBe(0);
-      expect(weapon3.Adaptation).toBe("AAAA");
+      expect(weapon3.Adaptation.air).toBe(5);
+      expect(weapon3.Adaptation.ground).toBe(5);
+      expect(weapon3.Adaptation.water).toBe(5);
+      expect(weapon3.Adaptation.space).toBe(5);
       expect(weapon3.CriticalMod).toBe(-10);
-      expect(weapon3.Traits).toBe("Ｍ投L1Ｐ実");
-      expect(weapon3.RequiredCondition).toBe("");
-      expect(weapon3.RequiredSkill).toBe("");
+      // Traits: Ｍ投L1 Ｐ 実
+      expect(weapon3.Traits).toHaveLength(3);
+      expect(weapon3.Traits[0].code).toBe("Ｍ投L1");
+      expect(weapon3.Traits[1].code).toBe("Ｐ");
+      expect(weapon3.Traits[2].code).toBe("実");
+
+      expect(weapon3.RequiredCondition).toBeInstanceOf(AndCondition);
+      expect(
+        (weapon3.RequiredCondition as AndCondition)["conditions"]
+      ).toHaveLength(0);
+      expect(weapon3.RequiredSkill).toHaveLength(0);
 
       // Abilities - test all properties
       expect(unit1.Abilities.length).toBe(2);
@@ -158,9 +194,12 @@ describe("Unit Parser", () => {
       expect(ability1.Stock).toBe(5);
       expect(ability1.ENCost).toBe(0);
       expect(ability1.RequiredMorale).toBe(0);
-      expect(ability1.Traits).toBe("");
-      expect(ability1.RequiredCondition).toBe("");
-      expect(ability1.RequiredSkill).toBe("");
+      expect(ability1.Traits).toHaveLength(0);
+      expect(ability1.RequiredCondition).toBeInstanceOf(AndCondition);
+      expect(
+        (ability1.RequiredCondition as AndCondition)["conditions"]
+      ).toHaveLength(0);
+      expect(ability1.RequiredSkill).toHaveLength(0);
       expect(ability1.Effects.length).toBeGreaterThan(0);
       expect(ability1.Effects[0].EffectType).toBe("回復");
       expect(ability1.Effects[0].EffectLevel).toBe(3);
@@ -173,9 +212,12 @@ describe("Unit Parser", () => {
       expect(ability2.Stock).toBe(3);
       expect(ability2.ENCost).toBe(0);
       expect(ability2.RequiredMorale).toBe(105);
-      expect(ability2.Traits).toBe("");
-      expect(ability2.RequiredCondition).toBe("");
-      expect(ability2.RequiredSkill).toBe("");
+      expect(ability2.Traits).toHaveLength(0);
+      expect(ability2.RequiredCondition).toBeInstanceOf(AndCondition);
+      expect(
+        (ability2.RequiredCondition as AndCondition)["conditions"]
+      ).toHaveLength(0);
+      expect(ability2.RequiredSkill).toHaveLength(0);
       expect(ability2.Effects.length).toBeGreaterThan(0);
       expect(ability2.Effects[0].EffectType).toBe("補給");
     });
@@ -270,7 +312,11 @@ describe("Unit Parser", () => {
       expect(longRangeWeapon).toBeDefined();
       if (!longRangeWeapon) return;
 
-      expect(longRangeWeapon.Traits).toBe("ＢＰＨ有");
+      expect(longRangeWeapon.Traits).toHaveLength(4);
+      expect(longRangeWeapon.Traits[0].code).toBe("Ｂ");
+      expect(longRangeWeapon.Traits[1].code).toBe("Ｐ");
+      expect(longRangeWeapon.Traits[2].code).toBe("Ｈ");
+      expect(longRangeWeapon.Traits[3].code).toBe("有");
     });
 
     // Test7
@@ -496,24 +542,43 @@ describe("Unit Parser", () => {
       const barrierFeature = unit.Features.find((f) => f.Name === "バリア");
       expect(barrierFeature).toBeDefined();
       if (barrierFeature) {
-        expect(barrierFeature.RequiredSkill).toBe("念力Lv3");
-        expect(barrierFeature.RequiredCondition).toBe("");
+        expect(barrierFeature.RequiredSkill).toHaveLength(1);
+        expect(barrierFeature.RequiredSkill[0].skillName).toBe("念力");
+        expect(barrierFeature.RequiredSkill[0].level).toBe(3);
+        expect(barrierFeature.RequiredCondition).toBeInstanceOf(AndCondition);
+        expect(
+          (barrierFeature.RequiredCondition as AndCondition)["conditions"]
+        ).toHaveLength(0);
       }
 
       // Required condition only: ステルス=狩人 <@森 or @林>
       const stealthFeature = unit.Features.find((f) => f.Name === "ステルス");
       expect(stealthFeature).toBeDefined();
       if (stealthFeature) {
-        expect(stealthFeature.RequiredSkill).toBe("");
-        expect(stealthFeature.RequiredCondition).toBe("@森 or @林");
+        expect(stealthFeature.RequiredSkill).toHaveLength(0);
+        // @森 or @林 -> OrCondition with [Atom(@森), Atom(@林)]
+        expect(stealthFeature.RequiredCondition).toBeInstanceOf(OrCondition);
+        const conds = (stealthFeature.RequiredCondition as OrCondition)[
+          "conditions"
+        ];
+        expect(conds).toHaveLength(2);
+        expect((conds[0] as AtomCondition).text).toBe("@森");
+        expect((conds[1] as AtomCondition).text).toBe("@林");
       }
 
       // Both: ＺＯＣ=砂地獄 <地上> (土遁の術Lv4)
       const zocFeature = unit.Features.find((f) => f.Name === "ＺＯＣ");
       expect(zocFeature).toBeDefined();
       if (zocFeature) {
-        expect(zocFeature.RequiredCondition).toBe("地上");
-        expect(zocFeature.RequiredSkill).toBe("土遁の術Lv4");
+        // "地上" -> AtomCondition
+        expect(zocFeature.RequiredCondition).toBeInstanceOf(AtomCondition);
+        expect((zocFeature.RequiredCondition as AtomCondition).text).toBe(
+          "地上"
+        );
+
+        expect(zocFeature.RequiredSkill).toHaveLength(1);
+        expect(zocFeature.RequiredSkill[0].skillName).toBe("土遁の術");
+        expect(zocFeature.RequiredSkill[0].level).toBe(4);
       }
     });
 
@@ -535,24 +600,39 @@ describe("Unit Parser", () => {
       const weapon1 = unit.Weapons.find((w) => w.Name === "念動斬り");
       expect(weapon1).toBeDefined();
       if (weapon1) {
-        expect(weapon1.RequiredSkill).toBe("念力Lv3");
-        expect(weapon1.RequiredCondition).toBe("");
+        expect(weapon1.RequiredSkill).toHaveLength(1);
+        expect(weapon1.RequiredSkill[0].skillName).toBe("念力");
+        expect(weapon1.RequiredSkill[0].level).toBe(3);
+        expect(weapon1.RequiredCondition).toBeInstanceOf(AndCondition);
+        expect(
+          (weapon1.RequiredCondition as AndCondition)["conditions"]
+        ).toHaveLength(0);
       }
 
       // Required condition only: ドリルアタック
       const weapon2 = unit.Weapons.find((w) => w.Name === "ドリルアタック");
       expect(weapon2).toBeDefined();
       if (weapon2) {
-        expect(weapon2.RequiredSkill).toBe("");
-        expect(weapon2.RequiredCondition).toBe("母艦3マス以内");
+        expect(weapon2.RequiredSkill).toHaveLength(0);
+        expect(weapon2.RequiredCondition).toBeInstanceOf(AtomCondition);
+        expect((weapon2.RequiredCondition as AtomCondition).text).toBe(
+          "母艦3マス以内"
+        );
       }
 
       // Both: 森林剣
       const weapon3 = unit.Weapons.find((w) => w.Name === "森林剣");
       expect(weapon3).toBeDefined();
       if (weapon3) {
-        expect(weapon3.RequiredCondition).toBe("@森 or @林");
-        expect(weapon3.RequiredSkill).toBe("剣技Lv2");
+        expect(weapon3.RequiredCondition).toBeInstanceOf(OrCondition);
+        const conds = (weapon3.RequiredCondition as OrCondition)["conditions"];
+        expect(conds).toHaveLength(2);
+        expect((conds[0] as AtomCondition).text).toBe("@森");
+        expect((conds[1] as AtomCondition).text).toBe("@林");
+
+        expect(weapon3.RequiredSkill).toHaveLength(1);
+        expect(weapon3.RequiredSkill[0].skillName).toBe("剣技");
+        expect(weapon3.RequiredSkill[0].level).toBe(2);
       }
     });
 
@@ -574,24 +654,40 @@ describe("Unit Parser", () => {
       const ability1 = unit.Abilities.find((a) => a.Name === "癒しの光");
       expect(ability1).toBeDefined();
       if (ability1) {
-        expect(ability1.RequiredSkill).toBe("術Lv3");
-        expect(ability1.RequiredCondition).toBe("");
+        expect(ability1.RequiredSkill).toHaveLength(1);
+        expect(ability1.RequiredSkill[0].skillName).toBe("術");
+        expect(ability1.RequiredSkill[0].level).toBe(3);
+        expect(ability1.RequiredCondition).toBeInstanceOf(AndCondition);
+        expect(
+          (ability1.RequiredCondition as AndCondition)["conditions"]
+        ).toHaveLength(0);
       }
 
       // Required condition only: 森林浴
       const ability2 = unit.Abilities.find((a) => a.Name === "森林浴");
       expect(ability2).toBeDefined();
       if (ability2) {
-        expect(ability2.RequiredSkill).toBe("");
-        expect(ability2.RequiredCondition).toBe("@森 or @林");
+        expect(ability2.RequiredSkill).toHaveLength(0);
+        expect(ability2.RequiredCondition).toBeInstanceOf(OrCondition);
+        const conds = (ability2.RequiredCondition as OrCondition)["conditions"];
+        expect(conds).toHaveLength(2);
+        expect((conds[0] as AtomCondition).text).toBe("@森");
+        expect((conds[1] as AtomCondition).text).toBe("@林");
       }
 
       // Both: 森のカーニバル
       const ability3 = unit.Abilities.find((a) => a.Name === "森のカーニバル");
       expect(ability3).toBeDefined();
       if (ability3) {
-        expect(ability3.RequiredCondition).toBe("@森 or @林");
-        expect(ability3.RequiredSkill).toBe("術Lv4");
+        expect(ability3.RequiredCondition).toBeInstanceOf(OrCondition);
+        const conds = (ability3.RequiredCondition as OrCondition)["conditions"];
+        expect(conds).toHaveLength(2);
+        expect((conds[0] as AtomCondition).text).toBe("@森");
+        expect((conds[1] as AtomCondition).text).toBe("@林");
+
+        expect(ability3.RequiredSkill).toHaveLength(1);
+        expect(ability3.RequiredSkill[0].skillName).toBe("術");
+        expect(ability3.RequiredSkill[0].level).toBe(4);
       }
     });
 
@@ -622,14 +718,40 @@ describe("Unit Parser", () => {
       );
       expect(movementFeature).toBeDefined();
       if (movementFeature) {
-        expect(movementFeature.RequiredCondition).toBe("@森 or @林 地上");
+        // @森 or @林 地上 -> And(Or(@森, @林), 地上)
+        expect(movementFeature.RequiredCondition).toBeInstanceOf(AndCondition);
+        const conds = (movementFeature.RequiredCondition as AndCondition)[
+          "conditions"
+        ];
+        expect(conds).toHaveLength(2);
+
+        expect(conds[0]).toBeInstanceOf(OrCondition);
+        const orConds = (conds[0] as OrCondition)["conditions"];
+        expect(orConds).toHaveLength(2);
+        expect((orConds[0] as AtomCondition).text).toBe("@森");
+        expect((orConds[1] as AtomCondition).text).toBe("@林");
+
+        expect(conds[1]).toBeInstanceOf(AtomCondition);
+        expect((conds[1] as AtomCondition).text).toBe("地上");
       }
 
       // Weapon with complex condition
       expect(unit.Weapons.length).toBe(1);
       const weapon = unit.Weapons[0];
       expect(weapon.Name).toBe("森林砲");
-      expect(weapon.RequiredCondition).toBe("@森 or @林 地上");
+
+      expect(weapon.RequiredCondition).toBeInstanceOf(AndCondition);
+      const wConds = (weapon.RequiredCondition as AndCondition)["conditions"];
+      expect(wConds).toHaveLength(2);
+
+      expect(wConds[0]).toBeInstanceOf(OrCondition);
+      const wOrConds = (wConds[0] as OrCondition)["conditions"];
+      expect(wOrConds).toHaveLength(2);
+      expect((wOrConds[0] as AtomCondition).text).toBe("@森");
+      expect((wOrConds[1] as AtomCondition).text).toBe("@林");
+
+      expect(wConds[1]).toBeInstanceOf(AtomCondition);
+      expect((wConds[1] as AtomCondition).text).toBe("地上");
     });
   });
 });
