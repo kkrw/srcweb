@@ -5,17 +5,16 @@ import { parseCondition } from "../models/Condition";
 import { parseSkillRequirement } from "../models/SkillRequirement";
 import { parseTraits } from "../models/Trait";
 import { WEAPON_LIMITS } from "./constants";
-import { ERROR_MESSAGES } from "./messages";
-import type { ParseResult } from "./ParseResult";
-import type { PreprocessedLine } from "./utils";
 import {
+  type PreprocessedLine,
   findFieldLineNumber,
   getLogicalLine,
-  ParseError,
-  parseIntField,
-  parseOptionalIntField,
   splitByComma,
-} from "./utils";
+} from "./lineProcessors";
+import { ERROR_MESSAGES } from "./messages";
+import type { ParseResult } from "./ParseResult";
+import { ParseError } from "./ParseResult";
+import { parseIntField, parseOptionalIntField } from "./utils";
 import {
   validateAdaptation,
   validateRange,

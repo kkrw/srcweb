@@ -5,7 +5,7 @@
 
 import { readFileSync } from "fs";
 import { join } from "path";
-import { parseUnitFile } from "./unitParser.js";
+import { parseUnitFile } from "../../parsers/unitParser.js";
 
 const fixturesPath = join(
   process.cwd(),

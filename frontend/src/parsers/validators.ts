@@ -1,4 +1,4 @@
-import { DEFAULTS, FORMAT, UNIT_SIZES } from "./constants";
+import { DEFAULTS, FORMAT, PERSONALITY, SEX, UNIT_SIZES } from "./constants";
 import { ERROR_MESSAGES } from "./messages";
 
 /**
@@ -24,14 +24,15 @@ export function validatePilotName(name: string): string | null {
  * Validates sex value
  */
 export function validateSex(sex: string): { value: string; warning?: string } {
-  const validSex = ["男性", "女性", "-"];
-  if (!validSex.includes(sex)) {
+  const validSex = Object.values(SEX);
+  if (validSex.includes(sex as (typeof SEX)[keyof typeof SEX])) {
+    return { value: sex };
+  } else {
     return {
-      value: "-",
+      value: SEX.UNKNOWN,
       warning: `性別の設定が間違っています。"-"に設定されました。`,
     };
   }
-  return { value: sex };
 }
 
 /**
@@ -41,14 +42,19 @@ export function validatePersonality(personality: string): {
   value: string;
   warning?: string;
 } {
-  const validPersonalities = ["機械", "弱気", "普通", "強気", "超強気"];
-  if (!validPersonalities.includes(personality)) {
+  const validPersonalities = Object.values(PERSONALITY);
+  if (
+    validPersonalities.includes(
+      personality as (typeof PERSONALITY)[keyof typeof PERSONALITY]
+    )
+  ) {
+    return { value: personality };
+  } else {
     return {
-      value: "普通",
+      value: PERSONALITY.NORMAL,
       warning: `性格の設定が間違っています。"普通"に設定されました。`,
     };
   }
-  return { value: personality };
 }
 
 /**

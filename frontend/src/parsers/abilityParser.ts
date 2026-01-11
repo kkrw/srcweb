@@ -5,18 +5,18 @@ import { parseCondition } from "../models/Condition";
 import { parseSkillRequirement } from "../models/SkillRequirement";
 import { parseTraits } from "../models/Trait";
 import { ABILITY_LIMITS } from "./constants";
-import { ERROR_MESSAGES } from "./messages";
-import type { ParseResult } from "./ParseResult";
-import type { PreprocessedLine } from "./utils";
 import {
+  type PreprocessedLine,
   findFieldLineNumber,
   getLogicalLine,
-  ParseError,
-  parseIntField,
-  parseOptionalIntField,
   splitByComma,
-} from "./utils";
+} from "./lineProcessors";
+import { ERROR_MESSAGES } from "./messages";
+import type { ParseResult } from "./ParseResult";
+import { ParseError } from "./ParseResult";
+import { parseIntField, parseOptionalIntField } from "./utils";
 import { validateRange, validateTraits } from "./validators";
+
 /**
  * Parses ability effect string into array of AbilityEffect objects
  * Based on VB5 AbilityData.cls SetEffect method (lines 63-191)

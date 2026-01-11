@@ -77,3 +77,9 @@ export const PERSONALITY = {
   STRONG: "強気",
   SUPER_STRONG: "超強気",
 } as const;
+
+export const SEX = {
+  MALE: "男性",
+  FEMALE: "女性",
+  UNKNOWN: "-",
+} as const;

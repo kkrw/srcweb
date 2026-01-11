@@ -16,20 +16,19 @@ import { createUnitData } from "../models/UnitData";
 import { parseAbility } from "./abilityParser.ts";
 import { DEFAULTS, UNIT_LIMITS } from "./constants";
 import {
-  parseFeaturesNewFormat,
-  parseFeaturesOldFormat,
-} from "./featureParser";
-import { ERROR_MESSAGES, warningSummary } from "./messages";
-import type { ParseResult, PreprocessedLine } from "./utils";
-import {
+  type PreprocessedLine,
   findFieldLineNumber,
   getLogicalLine,
-  isNumericString,
-  ParseError,
-  parseIntField,
   preprocessLines,
   splitByComma,
-} from "./utils";
+} from "./lineProcessors";
+import { ERROR_MESSAGES, warningSummary } from "./messages";
+import { type ParseResult, ParseError } from "./ParseResult";
+import {
+  parseUnitFeaturesNewFormat,
+  parseUnitFeaturesOldFormat,
+} from "./unitFeatureParser";
+import { isNumericString, parseIntField } from "./utils";
 import {
   validateAdaptation,
   validateBitmap,
@@ -437,13 +436,18 @@ function parseUnitData(
     } else if (featuresHeaderContent === "特殊能力") {
       // New format: multiple lines of abilities
       lineIndex = featuresHeaderLogicalLine.endIndex + 1;
-      const result = parseFeaturesNewFormat(lines, lineIndex, filePath, name);
+      const result = parseUnitFeaturesNewFormat(
+        lines,
+        lineIndex,
+        filePath,
+        name
+      );
       features.push(...result.features);
       lineIndex = result.nextLineIndex;
       warnings.push(...result.warnings);
     } else if (featuresHeaderContent.startsWith("特殊能力,")) {
       // Old format: "特殊能力, ability1, ability2, ..."
-      const result = parseFeaturesOldFormat(
+      const result = parseUnitFeaturesOldFormat(
         lines,
         featuresHeaderLogicalLine,
         filePath,

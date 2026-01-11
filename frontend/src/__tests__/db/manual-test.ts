@@ -6,7 +6,6 @@
  */
 
 import type { ZodError } from "zod";
-import { createGameState } from "../../models/GameState";
 import {
   clearAllTables,
   db,
@@ -21,7 +20,8 @@ import {
   type AssetCacheRecord,
   type SaveDataRecord,
   type UserSettingsRecord,
-} from "../index";
+} from "../../db/index";
+import { createGameState } from "../../models/GameState";
 
 /**
  * テスト結果の型

@@ -1,8 +1,8 @@
 import { readFileSync } from "fs";
 import { join } from "path";
 import { describe, expect, it } from "vitest";
+import { ParseError } from "../../parsers/ParseResult";
 import { parseUnitFile } from "../../parsers/unitParser";
-import { ParseError } from "../../parsers/utils";
 import { findFeatureByName } from "./testHelpers";
 
 const fixturesDir = join(__dirname, "fixtures");
@@ -641,55 +641,60 @@ describe("Unit Parser - Validation Tests", () => {
 
       expect(result.success).toBe(true);
 
-      const unit = result.data.find((u) => u.name === "実数値");
-      expect(unit).toBeDefined();
+      if (result.success) {
+        const unit = result.data.find((u) => u.name === "実数値");
+        expect(unit).toBeDefined();
 
-      if (unit) {
-        // Feature.Level should keep decimals
-        const shieldFeature = findFeatureByName(unit.features, "シールド");
-        expect(shieldFeature).toBeDefined();
-        if (shieldFeature) {
-          expect(shieldFeature.level).toBe(3.7); // シールドLv3.7
-        }
-
-        const hpRecoveryFeature = findFeatureByName(unit.features, "ＨＰ回復");
-        expect(hpRecoveryFeature).toBeDefined();
-        if (hpRecoveryFeature) {
-          expect(hpRecoveryFeature.level).toBe(2.3); // ＨＰ回復Lv2.3
-        }
-
-        // AbilityEffect.EffectLevel should keep decimals
-        if (unit.abilities.length > 0) {
-          const ability = unit.abilities[0];
-          expect(ability.effects).toBeDefined();
-          expect(ability.effects.length).toBeGreaterThan(0);
-
-          const healEffect = ability.effects.find(
-            (e) => e.effectType === "回復"
-          );
-          if (healEffect) {
-            expect(healEffect.effectLevel).toBe(2.8); // 回復Lv2.8
+        if (unit) {
+          // Feature.Level should keep decimals
+          const shieldFeature = findFeatureByName(unit.features, "シールド");
+          expect(shieldFeature).toBeDefined();
+          if (shieldFeature) {
+            expect(shieldFeature.level).toBe(3.7); // シールドLv3.7
           }
+
+          const hpRecoveryFeature = findFeatureByName(
+            unit.features,
+            "ＨＰ回復"
+          );
+          expect(hpRecoveryFeature).toBeDefined();
+          if (hpRecoveryFeature) {
+            expect(hpRecoveryFeature.level).toBe(2.3); // ＨＰ回復Lv2.3
+          }
+
+          // AbilityEffect.EffectLevel should keep decimals
+          if (unit.abilities.length > 0) {
+            const ability = unit.abilities[0];
+            expect(ability.effects).toBeDefined();
+            expect(ability.effects.length).toBeGreaterThan(0);
+
+            const healEffect = ability.effects.find(
+              (e) => e.effectType === "回復"
+            );
+            if (healEffect) {
+              expect(healEffect.effectLevel).toBe(2.8); // 回復Lv2.8
+            }
+          }
+
+          // "気L1.4" level in Traits is stored as-is as a string, not parsed as number
+          const weapon = unit.weapons[0];
+          expect(weapon.traits).toHaveLength(1);
+          expect(weapon.traits[0].code).toBe("気L1.4");
+
+          const ability = unit.abilities[0];
+          expect(ability.traits).toHaveLength(1);
+          expect(ability.traits[0].code).toBe("気L1.4");
+
+          // NO warnings should be generated for Feature.Level or AbilityEffect.EffectLevel
+          const floatFieldWarnings = result.warnings?.filter(
+            (w) =>
+              (w.includes("シールド") ||
+                w.includes("ＨＰ回復") ||
+                w.includes("回復Lv")) &&
+              w.includes("実数値が指定されたため")
+          );
+          expect(floatFieldWarnings?.length || 0).toBe(0);
         }
-
-        // "気L1.4" level in Traits is stored as-is as a string, not parsed as number
-        const weapon = unit.weapons[0];
-        expect(weapon.traits).toHaveLength(1);
-        expect(weapon.traits[0].code).toBe("気L1.4");
-
-        const ability = unit.abilities[0];
-        expect(ability.traits).toHaveLength(1);
-        expect(ability.traits[0].code).toBe("気L1.4");
-
-        // NO warnings should be generated for Feature.Level or AbilityEffect.EffectLevel
-        const floatFieldWarnings = result.warnings?.filter(
-          (w) =>
-            (w.includes("シールド") ||
-              w.includes("ＨＰ回復") ||
-              w.includes("回復Lv")) &&
-            w.includes("実数値が指定されたため")
-        );
-        expect(floatFieldWarnings?.length || 0).toBe(0);
       }
     });
 
@@ -759,7 +764,10 @@ describe("Unit Parser - Validation Tests", () => {
             expect(barrierFeature.level).toBe(4.5);
           }
 
-          const enRecoveryFeature = findFeatureByName(unit.features, "ＥＮ回復");
+          const enRecoveryFeature = findFeatureByName(
+            unit.features,
+            "ＥＮ回復"
+          );
           if (enRecoveryFeature) {
             expect(enRecoveryFeature.level).toBe(3.5);
           }

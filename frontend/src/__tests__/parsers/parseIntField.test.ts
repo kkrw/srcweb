@@ -3,7 +3,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { parseIntField, parseOptionalIntField } from '../utils';
+import { parseIntField, parseOptionalIntField } from '../../parsers/utils';
 
 describe('parseIntField', () => {
   it('should parse integer values without warning', () => {
