@@ -23,7 +23,10 @@ describe("Unit Parser", () => {
     "utf-8"
   );
 
-  describe("parseUnitFile", () => {
+  // ==========================================================================
+  // 初期パースと基本検証
+  // ==========================================================================
+  describe("parseUnitFile - 初期パースと基本検証", () => {
     // 取り込みが成功すること
     it("should successfully parse valid unit data", () => {
       const result = parseUnitFile(sampleUnitText);
@@ -54,7 +57,12 @@ describe("Unit Parser", () => {
       expect(unitNames).toContain("アビリティ条件テスト");
       expect(unitNames).toContain("複雑条件");
     });
+  });
 
+  // ==========================================================================
+  // 基本データと詳細パース (テスト1, 2)
+  // ==========================================================================
+  describe("基本データと詳細パース", () => {
     // Test1
     it("Test1: should parse Test Unit 1 with kana and new format abilities", () => {
       const result = parseUnitFile(sampleUnitText);
@@ -255,7 +263,12 @@ describe("Unit Parser", () => {
       expect(humanUnit.weapons[1].name).toBe("弓");
       expect(humanUnit.weapons[1].ammo).toBe(12);
     });
+  });
 
+  // ==========================================================================
+  // 省略・最小パターン (テスト3, 4)
+  // ==========================================================================
+  describe("省略・最小パターン", () => {
     // Test3
     it("Test3: should parse unit with no features", () => {
       const result = parseUnitFile(sampleUnitText);
@@ -288,7 +301,12 @@ describe("Unit Parser", () => {
       expect(minimalUnit.weapons.length).toBe(0);
       expect(minimalUnit.abilities.length).toBe(0);
     });
+  });
 
+  // ==========================================================================
+  // 複合・特殊データパターン (テスト5)
+  // ==========================================================================
+  describe("複合・特殊データパターン", () => {
     // Test5
     it("Test5: should parse unit with multiple movement types", () => {
       const result = parseUnitFile(sampleUnitText);
@@ -303,7 +321,12 @@ describe("Unit Parser", () => {
 
       expect(multiUnit.movementType).toBe("空陸水");
     });
+  });
 
+  // ==========================================================================
+  // 行継続パターン (テスト6)
+  // ==========================================================================
+  describe("行継続パターン", () => {
     // Test6
     it("Test6: should handle line continuation with underscore (Test 6 - weapons)", () => {
       const result = parseUnitFile(sampleUnitText);
@@ -329,7 +352,12 @@ describe("Unit Parser", () => {
       expect(longRangeWeapon.traits[2].code).toBe("Ｈ");
       expect(longRangeWeapon.traits[3].code).toBe("有");
     });
+  });
 
+  // ==========================================================================
+  // 武器・アビリティの条件とスキル要件 (テスト14, 15)
+  // ==========================================================================
+  describe("武器・アビリティの条件とスキル要件", () => {
     // Test14
     it("Test14: should parse required skills and conditions for weapons", () => {
       const result = parseUnitFile(sampleUnitText);
@@ -438,7 +466,12 @@ describe("Unit Parser", () => {
         expect(ability3.requiredSkill[0].level).toBe(4);
       }
     });
+  });
 
+  // ==========================================================================
+  // 複雑な条件式パターン (テスト16)
+  // ==========================================================================
+  describe("複雑な条件式パターン", () => {
     // Test16
     it("Test16: should parse complex condition expressions", () => {
       const result = parseUnitFile(sampleUnitText);
