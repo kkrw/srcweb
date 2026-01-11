@@ -16,6 +16,8 @@ export interface FeatureSpec {
   readonly effects: readonly FeatureEffect[];
   readonly description: string;
   readonly defaultLevel?: Float;
+  readonly mainPilotOnly?: boolean;
+  readonly visible?: boolean;
 }
 
 export interface Feature {
