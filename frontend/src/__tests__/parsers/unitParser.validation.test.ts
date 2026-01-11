@@ -3,6 +3,7 @@ import { join } from "path";
 import { describe, expect, it } from "vitest";
 import { parseUnitFile } from "../../parsers/unitParser";
 import { ParseError } from "../../parsers/utils";
+import { findFeatureByName } from "./testHelpers";
 
 const fixturesDir = join(__dirname, "fixtures");
 
@@ -233,10 +234,10 @@ describe("Unit Parser - Validation Tests", () => {
       const result = parseUnitFile(text, "invalid_unit_warnings.txt");
 
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "数値クラス");
+        const unit = result.data.find((u) => u.name === "数値クラス");
         expect(unit).toBeDefined();
         if (unit) {
-          expect(unit.UnitClass).toBe("汎用"); // Default value
+          expect(unit.unitClass).toBe("汎用"); // Default value
         }
 
         // Verify specific warning exists
@@ -256,10 +257,10 @@ describe("Unit Parser - Validation Tests", () => {
       const result = parseUnitFile(text, "invalid_unit_warnings.txt");
 
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "無効サイズ");
+        const unit = result.data.find((u) => u.name === "無効サイズ");
         expect(unit).toBeDefined();
         if (unit) {
-          expect(unit.Size).toBe("M"); // Default value
+          expect(unit.size).toBe("M"); // Default value
         }
 
         // Verify specific warning exists
@@ -279,10 +280,10 @@ describe("Unit Parser - Validation Tests", () => {
       const result = parseUnitFile(text, "invalid_unit_warnings.txt");
 
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "非数値パイロット");
+        const unit = result.data.find((u) => u.name === "非数値パイロット");
         expect(unit).toBeDefined();
         if (unit) {
-          expect(unit.PilotCapacity).toBe(1); // Default value
+          expect(unit.pilotCapacity).toBe(1); // Default value
         }
 
         const warning = result.warnings?.find((w) =>
@@ -305,30 +306,30 @@ describe("Unit Parser - Validation Tests", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "最小値");
+        const unit = result.data.find((u) => u.name === "最小値");
         expect(unit).toBeDefined();
         if (unit) {
-          expect(unit.Speed).toBe(0);
-          expect(unit.HP).toBe(0);
-          expect(unit.EN).toBe(0);
-          expect(unit.Armor).toBe(0);
-          expect(unit.Mobility).toBe(0);
+          expect(unit.speed).toBe(0);
+          expect(unit.hp).toBe(0);
+          expect(unit.en).toBe(0);
+          expect(unit.armor).toBe(0);
+          expect(unit.mobility).toBe(0);
 
-          if (unit.Weapons.length > 0) {
-            const weapon = unit.Weapons[0];
-            expect(weapon.AttackPower).toBe(0);
-            expect(weapon.MinRange).toBe(1);
-            expect(weapon.MaxRange).toBe(1);
-            expect(weapon.AccuracyMod).toBe(-999);
-            expect(weapon.CriticalMod).toBe(-999);
+          if (unit.weapons.length > 0) {
+            const weapon = unit.weapons[0];
+            expect(weapon.attackPower).toBe(0);
+            expect(weapon.minRange).toBe(1);
+            expect(weapon.maxRange).toBe(1);
+            expect(weapon.accuracyMod).toBe(-999);
+            expect(weapon.criticalMod).toBe(-999);
           }
 
-          if (unit.Abilities.length > 0) {
-            const ability = unit.Abilities[0];
-            expect(ability.MaxRange).toBe(0);
-            expect(ability.Stock).toBe(0);
-            expect(ability.ENCost).toBe(0);
-            expect(ability.RequiredMorale).toBe(0);
+          if (unit.abilities.length > 0) {
+            const ability = unit.abilities[0];
+            expect(ability.maxRange).toBe(0);
+            expect(ability.stock).toBe(0);
+            expect(ability.enCost).toBe(0);
+            expect(ability.requiredMorale).toBe(0);
           }
         }
       }
@@ -339,34 +340,34 @@ describe("Unit Parser - Validation Tests", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "最大値");
+        const unit = result.data.find((u) => u.name === "最大値");
         expect(unit).toBeDefined();
         if (unit) {
-          expect(unit.PilotCapacity).toBe(99);
-          expect(unit.NumItemSlots).toBe(99);
-          expect(unit.Speed).toBe(99);
-          expect(unit.HP).toBe(9999999);
-          expect(unit.EN).toBe(9999);
-          expect(unit.Armor).toBe(99999);
-          expect(unit.Mobility).toBe(9999);
+          expect(unit.pilotCapacity).toBe(99);
+          expect(unit.numItemSlots).toBe(99);
+          expect(unit.speed).toBe(99);
+          expect(unit.hp).toBe(9999999);
+          expect(unit.en).toBe(9999);
+          expect(unit.armor).toBe(99999);
+          expect(unit.mobility).toBe(9999);
 
-          if (unit.Weapons.length > 0) {
-            const weapon = unit.Weapons[0];
-            expect(weapon.AttackPower).toBe(99999);
-            expect(weapon.MaxRange).toBe(99);
-            expect(weapon.AccuracyMod).toBe(999);
-            expect(weapon.Ammo).toBe(99);
-            expect(weapon.ENCost).toBe(999);
-            expect(weapon.RequiredMorale).toBe(1000);
-            expect(weapon.CriticalMod).toBe(999);
+          if (unit.weapons.length > 0) {
+            const weapon = unit.weapons[0];
+            expect(weapon.attackPower).toBe(99999);
+            expect(weapon.maxRange).toBe(99);
+            expect(weapon.accuracyMod).toBe(999);
+            expect(weapon.ammo).toBe(99);
+            expect(weapon.enCost).toBe(999);
+            expect(weapon.requiredMorale).toBe(1000);
+            expect(weapon.criticalMod).toBe(999);
           }
 
-          if (unit.Abilities.length > 0) {
-            const ability = unit.Abilities[0];
-            expect(ability.MaxRange).toBe(99);
-            expect(ability.Stock).toBe(99);
-            expect(ability.ENCost).toBe(999);
-            expect(ability.RequiredMorale).toBe(1000);
+          if (unit.abilities.length > 0) {
+            const ability = unit.abilities[0];
+            expect(ability.maxRange).toBe(99);
+            expect(ability.stock).toBe(99);
+            expect(ability.enCost).toBe(999);
+            expect(ability.requiredMorale).toBe(1000);
           }
         }
       }
@@ -377,32 +378,32 @@ describe("Unit Parser - Validation Tests", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "超過最大値");
+        const unit = result.data.find((u) => u.name === "超過最大値");
         expect(unit).toBeDefined();
         if (unit) {
-          expect(unit.PilotCapacity).toBe(99);
-          expect(unit.NumItemSlots).toBe(99);
-          expect(unit.Speed).toBe(99);
-          expect(unit.HP).toBe(9999999);
-          expect(unit.EN).toBe(9999);
-          expect(unit.Armor).toBe(99999);
-          expect(unit.Mobility).toBe(9999);
+          expect(unit.pilotCapacity).toBe(99);
+          expect(unit.numItemSlots).toBe(99);
+          expect(unit.speed).toBe(99);
+          expect(unit.hp).toBe(9999999);
+          expect(unit.en).toBe(9999);
+          expect(unit.armor).toBe(99999);
+          expect(unit.mobility).toBe(9999);
 
-          if (unit.Weapons.length > 0) {
-            const weapon = unit.Weapons[0];
-            expect(weapon.AttackPower).toBe(99999);
-            expect(weapon.MaxRange).toBe(99);
-            expect(weapon.Ammo).toBe(99);
-            expect(weapon.ENCost).toBe(999);
-            expect(weapon.RequiredMorale).toBe(1000);
+          if (unit.weapons.length > 0) {
+            const weapon = unit.weapons[0];
+            expect(weapon.attackPower).toBe(99999);
+            expect(weapon.maxRange).toBe(99);
+            expect(weapon.ammo).toBe(99);
+            expect(weapon.enCost).toBe(999);
+            expect(weapon.requiredMorale).toBe(1000);
           }
 
-          if (unit.Abilities.length > 0) {
-            const ability = unit.Abilities[0];
-            expect(ability.MaxRange).toBe(99);
-            expect(ability.Stock).toBe(99);
-            expect(ability.ENCost).toBe(999);
-            expect(ability.RequiredMorale).toBe(1000);
+          if (unit.abilities.length > 0) {
+            const ability = unit.abilities[0];
+            expect(ability.maxRange).toBe(99);
+            expect(ability.stock).toBe(99);
+            expect(ability.enCost).toBe(999);
+            expect(ability.requiredMorale).toBe(1000);
           }
         }
       }
@@ -413,11 +414,11 @@ describe("Unit Parser - Validation Tests", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "負数許可");
+        const unit = result.data.find((u) => u.name === "負数許可");
         expect(unit).toBeDefined();
-        if (unit && unit.Weapons.length > 0) {
-          expect(unit.Weapons[0].AccuracyMod).toBe(-500);
-          expect(unit.Weapons[0].CriticalMod).toBe(-500);
+        if (unit && unit.weapons.length > 0) {
+          expect(unit.weapons[0].accuracyMod).toBe(-500);
+          expect(unit.weapons[0].criticalMod).toBe(-500);
         }
       }
     });
@@ -436,9 +437,9 @@ describe("Unit Parser - Validation Tests", () => {
             "負数許可",
             "全サイズ",
             "超過最大値",
-          ].includes(u.Name)
+          ].includes(u.name)
         );
-        const foundSizes = units.map((u) => u.Size);
+        const foundSizes = units.map((u) => u.size);
         sizes.forEach((size) => {
           expect(foundSizes).toContain(size);
         });
@@ -450,29 +451,29 @@ describe("Unit Parser - Validation Tests", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "全地形適応");
+        const unit = result.data.find((u) => u.name === "全地形適応");
         expect(unit).toBeDefined();
         if (unit) {
-          expect(unit.Adaptation.air).toBe(0); // Valid rank value check
-          expect(unit.Adaptation.ground).toBe(1); // Valid rank value check
-          expect(unit.Adaptation.water).toBe(2); // Valid rank value check
-          expect(unit.Adaptation.space).toBe(3); // Valid rank value check
-          if (unit.Weapons.length > 0) {
+          expect(unit.adaptation.air).toBe(0); // Valid rank value check
+          expect(unit.adaptation.ground).toBe(1); // Valid rank value check
+          expect(unit.adaptation.water).toBe(2); // Valid rank value check
+          expect(unit.adaptation.space).toBe(3); // Valid rank value check
+          if (unit.weapons.length > 0) {
             // BAS-
-            expect(unit.Weapons[0].Adaptation.air).toBe(4);
-            expect(unit.Weapons[0].Adaptation.ground).toBe(5);
-            expect(unit.Weapons[0].Adaptation.water).toBe(6);
-            expect(unit.Weapons[0].Adaptation.space).toBe(0);
+            expect(unit.weapons[0].adaptation.air).toBe(4);
+            expect(unit.weapons[0].adaptation.ground).toBe(5);
+            expect(unit.weapons[0].adaptation.water).toBe(6);
+            expect(unit.weapons[0].adaptation.space).toBe(0);
             // EDCB
-            expect(unit.Weapons[1].Adaptation.air).toBe(1);
-            expect(unit.Weapons[1].Adaptation.ground).toBe(2);
-            expect(unit.Weapons[1].Adaptation.water).toBe(3);
-            expect(unit.Weapons[1].Adaptation.space).toBe(4);
+            expect(unit.weapons[1].adaptation.air).toBe(1);
+            expect(unit.weapons[1].adaptation.ground).toBe(2);
+            expect(unit.weapons[1].adaptation.water).toBe(3);
+            expect(unit.weapons[1].adaptation.space).toBe(4);
             // ASDC
-            expect(unit.Weapons[2].Adaptation.air).toBe(5);
-            expect(unit.Weapons[2].Adaptation.ground).toBe(6);
-            expect(unit.Weapons[2].Adaptation.water).toBe(2);
-            expect(unit.Weapons[2].Adaptation.space).toBe(3);
+            expect(unit.weapons[2].adaptation.air).toBe(5);
+            expect(unit.weapons[2].adaptation.ground).toBe(6);
+            expect(unit.weapons[2].adaptation.water).toBe(2);
+            expect(unit.weapons[2].adaptation.space).toBe(3);
           }
         }
       }
@@ -483,48 +484,48 @@ describe("Unit Parser - Validation Tests", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "実数値");
+        const unit = result.data.find((u) => u.name === "実数値");
         expect(unit).toBeDefined();
         if (unit) {
           // Unit integer fields
-          expect(unit.Speed).toBe(5); // 4.5 → 5
-          expect(unit.HP).toBe(2001); // 2000.5 → 2001
-          expect(unit.EN).toBe(101); // 100.7 → 101
-          expect(unit.Armor).toBe(800); // 800.3 → 800
-          expect(unit.Mobility).toBe(81); // 80.9 → 81
-          expect(unit.Cost).toBe(2001); // 2000.5 → 2001
-          expect(unit.ExpValue).toBe(51); // 50.5 → 51
+          expect(unit.speed).toBe(5); // 4.5 → 5
+          expect(unit.hp).toBe(2001); // 2000.5 → 2001
+          expect(unit.en).toBe(101); // 100.7 → 101
+          expect(unit.armor).toBe(800); // 800.3 → 800
+          expect(unit.mobility).toBe(81); // 80.9 → 81
+          expect(unit.cost).toBe(2001); // 2000.5 → 2001
+          expect(unit.expValue).toBe(51); // 50.5 → 51
 
           // Weapon integer fields
-          if (unit.Weapons.length > 0) {
-            const weapon = unit.Weapons[0];
-            expect(weapon.Name).toBe("実数武器");
-            expect(weapon.AttackPower).toBe(1000); // 1000.4 → 1000
-            expect(weapon.MinRange).toBe(2); // 1.5 → 2
-            expect(weapon.MaxRange).toBe(2); // 1.5 → 2
-            expect(weapon.AccuracyMod).toBe(5); // +5 (no decimal)
-            expect(weapon.Ammo).toBe(11); // 10.6 → 11
-            expect(weapon.ENCost).toBe(30); // 30.2 → 30
-            expect(weapon.RequiredMorale).toBe(111); // 110.5 → 111
-            expect(weapon.CriticalMod).toBe(11); // +10.5 → 11
+          if (unit.weapons.length > 0) {
+            const weapon = unit.weapons[0];
+            expect(weapon.name).toBe("実数武器");
+            expect(weapon.attackPower).toBe(1000); // 1000.4 → 1000
+            expect(weapon.minRange).toBe(2); // 1.5 → 2
+            expect(weapon.maxRange).toBe(2); // 1.5 → 2
+            expect(weapon.accuracyMod).toBe(5); // +5 (no decimal)
+            expect(weapon.ammo).toBe(11); // 10.6 → 11
+            expect(weapon.enCost).toBe(30); // 30.2 → 30
+            expect(weapon.requiredMorale).toBe(111); // 110.5 → 111
+            expect(weapon.criticalMod).toBe(11); // +10.5 → 11
             // "気L1.4" is stored in Traits (not RequiredSkill, as it's not in parentheses)
-            expect(weapon.Traits).toHaveLength(1);
-            expect(weapon.Traits[0].code).toBe("気L1.4");
-            expect(weapon.RequiredSkill).toHaveLength(0);
+            expect(weapon.traits).toHaveLength(1);
+            expect(weapon.traits[0].code).toBe("気L1.4");
+            expect(weapon.requiredSkill).toHaveLength(0);
           }
 
           // Ability integer fields
-          if (unit.Abilities.length > 0) {
-            const ability = unit.Abilities[0];
-            expect(ability.Name).toBe("実数アビリティ");
-            expect(ability.MaxRange).toBe(6); // 5.8 → 6
-            expect(ability.Stock).toBe(10); // 10.3 → 10
-            expect(ability.ENCost).toBe(51); // 50.7 → 51
-            expect(ability.RequiredMorale).toBe(120); // 120.1 → 120
+          if (unit.abilities.length > 0) {
+            const ability = unit.abilities[0];
+            expect(ability.name).toBe("実数アビリティ");
+            expect(ability.maxRange).toBe(6); // 5.8 → 6
+            expect(ability.stock).toBe(10); // 10.3 → 10
+            expect(ability.enCost).toBe(51); // 50.7 → 51
+            expect(ability.requiredMorale).toBe(120); // 120.1 → 120
             // "気L1.4" is stored in Traits (not RequiredSkill)
-            expect(ability.Traits).toHaveLength(1);
-            expect(ability.Traits[0].code).toBe("気L1.4");
-            expect(ability.RequiredSkill).toHaveLength(0);
+            expect(ability.traits).toHaveLength(1);
+            expect(ability.traits[0].code).toBe("気L1.4");
+            expect(ability.requiredSkill).toHaveLength(0);
           }
         }
       }
@@ -640,47 +641,45 @@ describe("Unit Parser - Validation Tests", () => {
 
       expect(result.success).toBe(true);
 
-      const unit = result.data.find((u) => u.Name === "実数値");
+      const unit = result.data.find((u) => u.name === "実数値");
       expect(unit).toBeDefined();
 
       if (unit) {
         // Feature.Level should keep decimals
-        const shieldFeature = unit.Features.find((f) => f.Name === "シールド");
+        const shieldFeature = findFeatureByName(unit.features, "シールド");
         expect(shieldFeature).toBeDefined();
         if (shieldFeature) {
-          expect(shieldFeature.Level).toBe(3.7); // シールドLv3.7
+          expect(shieldFeature.level).toBe(3.7); // シールドLv3.7
         }
 
-        const hpRecoveryFeature = unit.Features.find((f) =>
-          f.Name.includes("ＨＰ回復")
-        );
+        const hpRecoveryFeature = findFeatureByName(unit.features, "ＨＰ回復");
         expect(hpRecoveryFeature).toBeDefined();
         if (hpRecoveryFeature) {
-          expect(hpRecoveryFeature.Level).toBe(2.3); // ＨＰ回復Lv2.3
+          expect(hpRecoveryFeature.level).toBe(2.3); // ＨＰ回復Lv2.3
         }
 
         // AbilityEffect.EffectLevel should keep decimals
-        if (unit.Abilities.length > 0) {
-          const ability = unit.Abilities[0];
-          expect(ability.Effects).toBeDefined();
-          expect(ability.Effects.length).toBeGreaterThan(0);
+        if (unit.abilities.length > 0) {
+          const ability = unit.abilities[0];
+          expect(ability.effects).toBeDefined();
+          expect(ability.effects.length).toBeGreaterThan(0);
 
-          const healEffect = ability.Effects.find(
-            (e) => e.EffectType === "回復"
+          const healEffect = ability.effects.find(
+            (e) => e.effectType === "回復"
           );
           if (healEffect) {
-            expect(healEffect.EffectLevel).toBe(2.8); // 回復Lv2.8
+            expect(healEffect.effectLevel).toBe(2.8); // 回復Lv2.8
           }
         }
 
         // "気L1.4" level in Traits is stored as-is as a string, not parsed as number
-        const weapon = unit.Weapons[0];
-        expect(weapon.Traits).toHaveLength(1);
-        expect(weapon.Traits[0].code).toBe("気L1.4");
+        const weapon = unit.weapons[0];
+        expect(weapon.traits).toHaveLength(1);
+        expect(weapon.traits[0].code).toBe("気L1.4");
 
-        const ability = unit.Abilities[0];
-        expect(ability.Traits).toHaveLength(1);
-        expect(ability.Traits[0].code).toBe("気L1.4");
+        const ability = unit.abilities[0];
+        expect(ability.traits).toHaveLength(1);
+        expect(ability.traits[0].code).toBe("気L1.4");
 
         // NO warnings should be generated for Feature.Level or AbilityEffect.EffectLevel
         const floatFieldWarnings = result.warnings?.filter(
@@ -699,88 +698,86 @@ describe("Unit Parser - Validation Tests", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "実数丸め");
+        const unit = result.data.find((u) => u.name === "実数丸め");
         expect(unit).toBeDefined();
         if (unit) {
           // Test that .5 rounds UP (Math.round behavior), not to even (banker's rounding)
           // Speed: 4.5 → 5 (rounds up)
-          expect(unit.Speed).toBe(5);
+          expect(unit.speed).toBe(5);
           // HP: 2999.5 → 3000 (rounds up)
-          expect(unit.HP).toBe(3000);
+          expect(unit.hp).toBe(3000);
           // EN: 99.5 → 100 (rounds up)
-          expect(unit.EN).toBe(100);
+          expect(unit.en).toBe(100);
           // Armor: 999.5 → 1000 (rounds up)
-          expect(unit.Armor).toBe(1000);
+          expect(unit.armor).toBe(1000);
           // Mobility: 99.5 → 100 (rounds up)
-          expect(unit.Mobility).toBe(100);
+          expect(unit.mobility).toBe(100);
           // Cost: 2000.5 → 2001 (rounds up)
-          expect(unit.Cost).toBe(2001);
+          expect(unit.cost).toBe(2001);
           // ExpValue: 50.5 → 51 (rounds up)
-          expect(unit.ExpValue).toBe(51);
+          expect(unit.expValue).toBe(51);
 
           // Weapon fields
-          if (unit.Weapons.length > 0) {
-            const weapon = unit.Weapons[0];
-            expect(weapon.Name).toBe("丸め武器");
+          if (unit.weapons.length > 0) {
+            const weapon = unit.weapons[0];
+            expect(weapon.name).toBe("丸め武器");
             // AttackPower: 1999.5 → 2000 (rounds up)
-            expect(weapon.AttackPower).toBe(2000);
+            expect(weapon.attackPower).toBe(2000);
             // MinRange: 1.5 → 2 (rounds up)
-            expect(weapon.MinRange).toBe(2);
+            expect(weapon.minRange).toBe(2);
             // MaxRange: 1.5 → 2 (rounds up)
-            expect(weapon.MaxRange).toBe(2);
+            expect(weapon.maxRange).toBe(2);
             // AccuracyMod: 0.5 → 1 (rounds up)
-            expect(weapon.AccuracyMod).toBe(1);
+            expect(weapon.accuracyMod).toBe(1);
             // Ammo: 9.5 → 10 (rounds up)
-            expect(weapon.Ammo).toBe(10);
+            expect(weapon.ammo).toBe(10);
             // ENCost: 99.5 → 100 (rounds up)
-            expect(weapon.ENCost).toBe(100);
+            expect(weapon.enCost).toBe(100);
             // RequiredMorale: 100.5 → 101 (rounds up)
-            expect(weapon.RequiredMorale).toBe(101);
+            expect(weapon.requiredMorale).toBe(101);
             // CriticalMod: 0.5 → 1 (rounds up)
-            expect(weapon.CriticalMod).toBe(1);
+            expect(weapon.criticalMod).toBe(1);
           }
 
           // Ability fields
-          if (unit.Abilities.length > 0) {
-            const ability = unit.Abilities[0];
-            expect(ability.Name).toBe("丸めアビリティ");
+          if (unit.abilities.length > 0) {
+            const ability = unit.abilities[0];
+            expect(ability.name).toBe("丸めアビリティ");
             // MaxRange: 9.5 → 10 (rounds up)
-            expect(ability.MaxRange).toBe(10);
+            expect(ability.maxRange).toBe(10);
             // Stock: 9.5 → 10 (rounds up)
-            expect(ability.Stock).toBe(10);
+            expect(ability.stock).toBe(10);
             // ENCost: 99.5 → 100 (rounds up)
-            expect(ability.ENCost).toBe(100);
+            expect(ability.enCost).toBe(100);
             // RequiredMorale: 100.5 → 101 (rounds up)
-            expect(ability.RequiredMorale).toBe(101);
+            expect(ability.requiredMorale).toBe(101);
           }
 
           // Feature.Level should keep .5 as float
-          const barrierFeature = unit.Features.find((f) => f.Name === "バリア");
+          const barrierFeature = findFeatureByName(unit.features, "バリア");
           if (barrierFeature) {
-            expect(barrierFeature.Level).toBe(4.5);
+            expect(barrierFeature.level).toBe(4.5);
           }
 
-          const enRecoveryFeature = unit.Features.find((f) =>
-            f.Name.includes("ＥＮ回復")
-          );
+          const enRecoveryFeature = findFeatureByName(unit.features, "ＥＮ回復");
           if (enRecoveryFeature) {
-            expect(enRecoveryFeature.Level).toBe(3.5);
+            expect(enRecoveryFeature.level).toBe(3.5);
           }
 
           // AbilityEffect.EffectLevel should keep .5 as float
-          if (unit.Abilities.length > 0) {
-            const ability = unit.Abilities[0];
-            const addEffect = ability.Effects.find(
-              (e) => e.EffectType === "付加"
+          if (unit.abilities.length > 0) {
+            const ability = unit.abilities[0];
+            const addEffect = ability.effects.find(
+              (e) => e.effectType === "付加"
             );
             if (addEffect) {
-              expect(addEffect.EffectLevel).toBe(1.5);
+              expect(addEffect.effectLevel).toBe(1.5);
             }
-            const healEffect = ability.Effects.find(
-              (e) => e.EffectType === "回復"
+            const healEffect = ability.effects.find(
+              (e) => e.effectType === "回復"
             );
             if (healEffect) {
-              expect(healEffect.EffectLevel).toBe(1.5);
+              expect(healEffect.effectLevel).toBe(1.5);
             }
           }
         }
@@ -792,42 +789,44 @@ describe("Unit Parser - Validation Tests", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "負実数");
+        const unit = result.data.find((u) => u.name === "負実数");
         expect(unit).toBeDefined();
         if (unit) {
           // Weapon with negative decimals
-          if (unit.Weapons.length > 0) {
-            const weapon = unit.Weapons[0];
-            expect(weapon.Name).toBe("負実数武器");
+          if (unit.weapons.length > 0) {
+            const weapon = unit.weapons[0];
+            expect(weapon.name).toBe("負実数武器");
             // AccuracyMod: -15.7 → Math.round(-15.7) = -16
-            expect(weapon.AccuracyMod).toBe(-16);
+            expect(weapon.accuracyMod).toBe(-16);
             // CriticalMod: -20.3 → Math.round(-20.3) = -20
-            expect(weapon.CriticalMod).toBe(-20);
+            expect(weapon.criticalMod).toBe(-20);
           }
 
           // Feature.Level can be negative decimal
-          const hpRecoveryFeature = unit.Features.find((f) =>
-            f.Name.includes("ＨＰ回復")
+          const hpRecoveryFeature = findFeatureByName(
+            unit.features,
+            "ＨＰ回復"
           );
           if (hpRecoveryFeature) {
-            expect(hpRecoveryFeature.Level).toBe(-2.7);
+            expect(hpRecoveryFeature.level).toBe(-2.7);
           }
 
-          const enRecoveryFeature = unit.Features.find((f) =>
-            f.Name.includes("ＥＮ回復")
+          const enRecoveryFeature = findFeatureByName(
+            unit.features,
+            "ＥＮ回復"
           );
           if (enRecoveryFeature) {
-            expect(enRecoveryFeature.Level).toBe(-1.3);
+            expect(enRecoveryFeature.level).toBe(-1.3);
           }
 
           // AbilityEffect.EffectLevel can be negative decimal
-          if (unit.Abilities.length > 0) {
-            const ability = unit.Abilities[0];
-            const addEffect = ability.Effects.find(
-              (e) => e.EffectType === "付加"
+          if (unit.abilities.length > 0) {
+            const ability = unit.abilities[0];
+            const addEffect = ability.effects.find(
+              (e) => e.effectType === "付加"
             );
             if (addEffect) {
-              expect(addEffect.EffectLevel).toBe(-1.2);
+              expect(addEffect.effectLevel).toBe(-1.2);
             }
           }
         }
@@ -861,20 +860,16 @@ describe("Unit Parser - Validation Tests", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        const unit = result.data.find((u) => u.Name === "超大レベル");
+        const unit = result.data.find((u) => u.name === "超大レベル");
         expect(unit).toBeDefined();
-        if (unit && unit.Features.length > 0) {
-          const shieldFeature = unit.Features.find((f) =>
-            f.Name.includes("シールド")
-          );
+        if (unit && unit.features.length > 0) {
+          const shieldFeature = findFeatureByName(unit.features, "シールド");
           if (shieldFeature) {
-            expect(shieldFeature.Level).toBe(9999);
+            expect(shieldFeature.level).toBe(9999);
           }
-          const hpFeature = unit.Features.find((f) =>
-            f.Name.includes("ＨＰ回復")
-          );
+          const hpFeature = findFeatureByName(unit.features, "ＨＰ回復");
           if (hpFeature) {
-            expect(hpFeature.Level).toBe(10000);
+            expect(hpFeature.level).toBe(10000);
           }
         }
       }

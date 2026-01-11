@@ -5,62 +5,53 @@
  */
 
 // Branded Types
-export type { Integer, Float } from "./BrandedTypes";
-export {
-  isInteger,
-  toInteger,
-  toFloat,
-  hasDecimalPart,
-} from "./BrandedTypes";
+export { hasDecimalPart, isInteger, toFloat, toInteger } from "./BrandedTypes";
+export type { Float, Integer } from "./BrandedTypes";
 
 // Feature Data
-export type { FeatureData } from "./FeatureData";
-export { DEFAULT_LEVEL, createFeatureData } from "./FeatureData";
+export { createFeatureData, DEFAULT_LEVEL } from "./FeatureData";
+export type { Feature as FeatureData } from "./FeatureData";
 
 // Weapon Data
-export type { WeaponData } from "./WeaponData";
 export { createWeaponData, isItemWeapon } from "./WeaponData";
+export type { WeaponData } from "./WeaponData";
 
 // Ability Data
-export type { AbilityData, AbilityEffect } from "./AbilityData";
 export {
   createAbilityData,
   createAbilityEffect,
   isItemAbility,
 } from "./AbilityData";
+export type { AbilityData, AbilityEffect } from "./AbilityData";
 
 // Unit Data
-export type { UnitData } from "./UnitData";
 export { createUnitData, getBitmap as getUnitBitmap } from "./UnitData";
-
-// Skill Data
-export type { SkillData } from "./SkillData";
-export { createSkillData } from "./SkillData";
+export type { UnitData } from "./UnitData";
 
 // Special Power
-export type { SpecialPower } from "./SpecialPower";
 export { createSpecialPower } from "./SpecialPower";
+export type { SpecialPower } from "./SpecialPower";
 
 // Pilot Data
-export type { PilotData } from "./PilotData";
 export { createPilotData, getBitmap as getPilotBitmap } from "./PilotData";
+export type { PilotData } from "./PilotData";
 
 // Map Data
-export type { MapData, MapCell } from "./MapData";
-export { createMapData, createMapCell, getCell, setCell } from "./MapData";
+export { createMapCell, createMapData, getCell, setCell } from "./MapData";
+export type { MapCell, MapData } from "./MapData";
 
 // Hot Point
-export type { HotPoint } from "./HotPoint";
 export { createHotPoint } from "./HotPoint";
+export type { HotPoint } from "./HotPoint";
 
 // Event State
-export type { EventState } from "./EventState";
 export { createEventState } from "./EventState";
+export type { EventState } from "./EventState";
 
 // User Settings
-export type { UserSettings } from "./UserSettings";
 export { createUserSettings } from "./UserSettings";
+export type { UserSettings } from "./UserSettings";
 
 // Game State
-export type { GameState } from "./GameState";
 export { createGameState } from "./GameState";
+export type { GameState } from "./GameState";

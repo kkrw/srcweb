@@ -1,4 +1,4 @@
-import { DEFAULTS } from "../../parsers/constants";
+import { DEFAULTS } from "../parsers/constants";
 
 /**
  * 地形適応 (Air, Ground, Water, Space) を表すクラス

@@ -55,6 +55,7 @@ export const DEFAULTS = {
   ADAPTATION: "AAAA",
   ADAPTATION_SINGLE: "A",
   BITMAP: "-.bmp",
+  BGM_FILE: "-.mid",
   UNIT_CLASS: "汎用",
 } as const;
 
@@ -64,4 +65,15 @@ export const DEFAULTS = {
 export const FORMAT = {
   ADAPTATION_LENGTH: 4,
   BITMAP_EXTENSION: ".bmp",
+} as const;
+
+/**
+ * Valid personality types
+ */
+export const PERSONALITY = {
+  MACHINE: "機械",
+  WEAK: "弱気",
+  NORMAL: "普通",
+  STRONG: "強気",
+  SUPER_STRONG: "超強気",
 } as const;

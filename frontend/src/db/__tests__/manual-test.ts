@@ -286,10 +286,10 @@ export async function testCRUDOperations(): Promise<void> {
       turn: 42,
       deleted: false,
       gameState: createGameState({
-        ScenarioFileName: "test.eve",
-        Phase: "味方",
-        Turn: 42,
-        Money: 10000,
+        scenarioFileName: "test.eve",
+        phase: "味方",
+        turn: 42,
+        money: 10000,
       }),
       units: [],
       pilots: [],
@@ -319,7 +319,7 @@ export async function testCRUDOperations(): Promise<void> {
       logTestResult(
         "Read SaveData",
         true,
-        `SaveData retrieved: Turn ${retrievedSave.turn}, Money ${retrievedSave.gameState.Money}`
+        `SaveData retrieved: Turn ${retrievedSave.turn}, Money ${retrievedSave.gameState.money}`
       );
     } else {
       logTestResult("Read SaveData", false, "SaveData not found");
@@ -330,7 +330,7 @@ export async function testCRUDOperations(): Promise<void> {
 
     if (retrievedSave) {
       retrievedSave.turn = 100;
-      retrievedSave.gameState.Money = 50000;
+      retrievedSave.gameState.money = 50000;
       await db.saveData.put(retrievedSave);
 
       const updatedSave = await db.saveData.get([
@@ -341,7 +341,7 @@ export async function testCRUDOperations(): Promise<void> {
       if (
         updatedSave &&
         updatedSave.turn === 100 &&
-        updatedSave.gameState.Money === 50000
+        updatedSave.gameState.money === 50000
       ) {
         logTestResult("Update SaveData", true, "SaveData updated successfully");
       } else {

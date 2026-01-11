@@ -1,8 +1,9 @@
-import { Adaptation } from "../Adaptation";
+import { Adaptation } from "../../models/Adaptation";
+import { DEFAULTS } from "../../parsers/constants";
 
 describe("Adaptation Parser", () => {
   it("should parse valid AAAA string", () => {
-    const adapt = Adaptation.fromString("AAAA");
+    const adapt = Adaptation.fromString(DEFAULTS.ADAPTATION);
     expect(adapt.air).toBe(5); // A
     expect(adapt.ground).toBe(5); // A
     expect(adapt.water).toBe(5); // A

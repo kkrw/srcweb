@@ -1,4 +1,4 @@
-import { parseTraits } from "../Trait";
+import { parseTraits } from "../../models/Trait";
 
 describe("Trait Parser", () => {
   it("should parse simple single-character traits", () => {

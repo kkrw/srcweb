@@ -5,26 +5,26 @@
  * 例: 回復、変身、召喚など
  */
 import { type Float, type Integer } from "./BrandedTypes";
-import { AndCondition, type Condition } from "./interpreter/Condition";
-import { type SkillRequirement } from "./interpreter/SkillRequirement";
-import { type Trait } from "./interpreter/Trait";
+import { AndCondition, type Condition } from "./Condition";
+import { type SkillRequirement } from "./SkillRequirement";
+import { type Trait } from "./Trait";
 
 export interface AbilityEffect {
   /**
    * 効果の種類
    * 例: "回復", "変身", "召喚"
    */
-  EffectType: string;
+  effectType: string;
 
   /**
    * 効果量やレベル
    */
-  EffectLevel: Float;
+  effectLevel: Float;
 
   /**
    * 補足パラメータ文字列
    */
-  EffectData: string;
+  effectData: string;
 }
 
 /**
@@ -37,57 +37,57 @@ export interface AbilityData {
   /**
    * アビリティを識別する名称（主キー候補）
    */
-  Name: string;
+  name: string;
 
   /**
    * 使用可能回数（残弾数に相当）
    */
-  Stock: Integer;
+  stock: Integer;
 
   /**
    * 使用時に消費するEN量
    */
-  ENCost: Integer;
+  enCost: Integer;
 
   /**
    * 使用に必要な気力
    */
-  RequiredMorale: Integer;
+  requiredMorale: Integer;
 
   /**
    * 効果が及ぶ最小範囲
    */
-  MinRange: Integer;
+  minRange: Integer;
 
   /**
    * 効果が及ぶ最大範囲（射程）
    * 0の場合は自分自身、または射程なし（変身など）を意味します
    */
-  MaxRange: Integer;
+  maxRange: Integer;
 
   /**
    * アビリティの分類や属性
    * 例: "P": 移動後使用可, "M": マップ兵器
    * 複数の属性を配列で保持します（順序保持）
    */
-  Traits: Trait[];
+  traits: Trait[];
 
   /**
    * 使用に必要なパイロット技能
    * 例: "ニュータイプ Lv1"
    * "アイテム" が含まれる場合、消費アイテムとして判定されます
    */
-  RequiredSkill: SkillRequirement[];
+  requiredSkill: SkillRequirement[];
 
   /**
    * 使用に必要なその他の条件
    */
-  RequiredCondition: Condition;
+  requiredCondition: Condition;
 
   /**
    * アビリティが持つ具体的な効果内容のリスト
    */
-  Effects: AbilityEffect[];
+  effects: AbilityEffect[];
 }
 
 /**
@@ -97,9 +97,9 @@ export function createAbilityEffect(
   params: Partial<AbilityEffect> = {}
 ): AbilityEffect {
   return {
-    EffectType: params.EffectType || "",
-    EffectLevel: params.EffectLevel || (0 as Float),
-    EffectData: params.EffectData || "",
+    effectType: params.effectType || "",
+    effectLevel: params.effectLevel || (0 as Float),
+    effectData: params.effectData || "",
   };
 }
 
@@ -110,16 +110,16 @@ export function createAbilityData(
   params: Partial<AbilityData> = {}
 ): AbilityData {
   return {
-    Name: params.Name || "",
-    Stock: params.Stock || (0 as Integer),
-    ENCost: params.ENCost || (0 as Integer),
-    RequiredMorale: params.RequiredMorale || (0 as Integer),
-    MinRange: params.MinRange || (0 as Integer),
-    MaxRange: params.MaxRange || (0 as Integer),
-    Traits: params.Traits || [],
-    RequiredSkill: params.RequiredSkill || [],
-    RequiredCondition: params.RequiredCondition || new AndCondition([]),
-    Effects: params.Effects || [],
+    name: params.name || "",
+    stock: params.stock || (0 as Integer),
+    enCost: params.enCost || (0 as Integer),
+    requiredMorale: params.requiredMorale || (0 as Integer),
+    minRange: params.minRange || (0 as Integer),
+    maxRange: params.maxRange || (0 as Integer),
+    traits: params.traits || [],
+    requiredSkill: params.requiredSkill || [],
+    requiredCondition: params.requiredCondition || new AndCondition([]),
+    effects: params.effects || [],
   };
 }
 
@@ -127,5 +127,5 @@ export function createAbilityData(
  * 消費アイテムかどうかを判定します
  */
 export function isItemAbility(ability: AbilityData): boolean {
-  return ability.RequiredSkill.some((skill) => skill.skillName === "アイテム");
+  return ability.requiredSkill.some((skill) => skill.skillName === "アイテム");
 }

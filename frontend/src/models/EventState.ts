@@ -11,87 +11,87 @@ export interface EventState {
    * グローバル変数
    * ユーザー定義変数（フラグ等）を Key-Value 形式で管理
    */
-  GlobalVariables: Map<string, string | number>;
+  globalVariables: Map<string, string | number>;
 
   /**
    * ローカル変数
    * イベント実行中の一時変数
    * 中断セーブに含まれます
    */
-  LocalVariables: Map<string, string | number>;
+  localVariables: Map<string, string | number>;
 
   /**
    * イベントラベルの状態
    * 各イベントラベルの有効/無効（Enable）状態
    * 一度しか起きないイベントの管理に使用
    */
-  EventLabels: Map<string, boolean>;
+  eventLabels: Map<string, boolean>;
 
   /**
    * 追加イベントファイル名のリスト
    * Require コマンドで動的に読み込まれたイベントファイル
    */
-  AdditionalEventFiles: string[];
+  additionalEventFiles: string[];
 
   /**
    * ホットポイントのリスト
    * マップ上のクリック可能領域
    */
-  HotPoints: HotPoint[];
+  hotPoints: HotPoint[];
 
   /**
    * 現在の実行行番号
    * スクリプトのどこまで実行したか
    */
-  CurrentLineNum: number;
+  currentLineNum: number;
 
   /**
    * コールスタック
    * Call コマンドでサブルーチンに飛んでいる場合の戻り先行番号
    */
-  CallStack: number[];
+  callStack: number[];
 
   /**
    * 呼び出し階層の深さ
    * 現在のネストの深さ
    */
-  CallDepth: number;
+  callDepth: number;
 
   /**
    * 引数スタック
    * サブルーチンに渡された引数の状態
    */
-  ArgStack: (string | number)[];
+  argStack: (string | number)[];
 
   /**
    * ローカル変数スタック
    * サブルーチン内で定義されたローカル変数の状態
    */
-  VarStack: Map<string, string | number>[];
+  varStack: Map<string, string | number>[];
 
   /**
    * Forループカウンタスタック
    * For ループの現在のカウンタ値
    */
-  ForIndexStack: number[];
+  forIndexStack: number[];
 
   /**
    * Forループ上限スタック
    * For ループの終了条件値
    */
-  ForLimitStack: number[];
+  forLimitStack: number[];
 
   /**
    * ForEachインデックス
    * ForEach ループの現在位置
    */
-  ForEachIndex: number;
+  forEachIndex: number;
 
   /**
    * ForEachセット
    * ForEach ループで使用しているコレクション
    */
-  ForEachSet: string[];
+  forEachSet: string[];
 }
 
 /**
@@ -99,19 +99,19 @@ export interface EventState {
  */
 export function createEventState(params: Partial<EventState> = {}): EventState {
   return {
-    GlobalVariables: params.GlobalVariables || new Map(),
-    LocalVariables: params.LocalVariables || new Map(),
-    EventLabels: params.EventLabels || new Map(),
-    AdditionalEventFiles: params.AdditionalEventFiles || [],
-    HotPoints: params.HotPoints || [],
-    CurrentLineNum: params.CurrentLineNum || 0,
-    CallStack: params.CallStack || [],
-    CallDepth: params.CallDepth || 0,
-    ArgStack: params.ArgStack || [],
-    VarStack: params.VarStack || [],
-    ForIndexStack: params.ForIndexStack || [],
-    ForLimitStack: params.ForLimitStack || [],
-    ForEachIndex: params.ForEachIndex || 0,
-    ForEachSet: params.ForEachSet || [],
+    globalVariables: params.globalVariables || new Map(),
+    localVariables: params.localVariables || new Map(),
+    eventLabels: params.eventLabels || new Map(),
+    additionalEventFiles: params.additionalEventFiles || [],
+    hotPoints: params.hotPoints || [],
+    currentLineNum: params.currentLineNum || 0,
+    callStack: params.callStack || [],
+    callDepth: params.callDepth || 0,
+    argStack: params.argStack || [],
+    varStack: params.varStack || [],
+    forIndexStack: params.forIndexStack || [],
+    forLimitStack: params.forLimitStack || [],
+    forEachIndex: params.forEachIndex || 0,
+    forEachSet: params.forEachSet || [],
   };
 }

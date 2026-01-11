@@ -8,13 +8,13 @@ export interface UserSettings {
    * グリッド表示
    * マップのグリッド線を表示するかどうか
    */
-  ShowGridLines: boolean;
+  showGridLines: boolean;
 
   /**
    * 戦闘アニメーション
    * 戦闘アニメのON/OFF設定
    */
-  EnableBattleAnimation: boolean;
+  enableBattleAnimation: boolean;
 }
 
 /**
@@ -22,7 +22,7 @@ export interface UserSettings {
  */
 export function createUserSettings(params: Partial<UserSettings> = {}): UserSettings {
   return {
-    ShowGridLines: params.ShowGridLines ?? true,
-    EnableBattleAnimation: params.EnableBattleAnimation ?? true,
+    showGridLines: params.showGridLines ?? true,
+    enableBattleAnimation: params.enableBattleAnimation ?? true,
   };
 }

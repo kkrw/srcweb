@@ -1,10 +1,78 @@
 /**
  * Parser utilities for SRC data files
- *
- * Common utilities for parsing Shift-JIS encoded text files
  */
 
 import Encoding from "encoding-japanese";
+import { DEFAULTS, FORMAT } from "./constants";
+
+/**
+ * Result type for parsing operations
+ */
+export type ParseResult<T> =
+  | {
+      success: true;
+      data: T;
+      warnings?: string[]; // Validation warnings (non-fatal)
+    }
+  | {
+      success: false;
+      error: Error;
+      warnings?: string[]; // Warnings collected before error
+    };
+
+export type PreprocessedLine = {
+  /** Line content (with _ removed if it was a continuation line) */
+  content: string;
+  /** Original line number in the source file (1-based) */
+  lineNumber: number;
+  /** Whether this line continues to the next line (had _ at the end) */
+  isContinuation: boolean;
+};
+
+/**
+ * Result of parsing a logical line (with continuations merged)
+ */
+export type LogicalLineResult = {
+  /** Merged content of the logical line */
+  content: string;
+  /** Starting index in the preprocessed lines array */
+  startIndex: number;
+  /** Ending index in the preprocessed lines array (inclusive) */
+  endIndex: number;
+  /** Line number of the first physical line */
+  startLineNumber: number;
+  /** Line number of the last physical line */
+  endLineNumber: number;
+};
+
+/**
+ * Result type for numeric field parsing with optional warning
+ */
+export interface ParseNumericResult {
+  value: number;
+  warning?: string;
+}
+
+/**
+ * Error type for parser errors
+ */
+export class ParseError extends Error {
+  public readonly lineNumber: number; // 1-based line number for display
+  public readonly lineContent: string;
+
+  constructor(
+    message: string,
+    lineNumber: number, // 1-based line number
+    lineContent: string
+  ) {
+    super(
+      `Parse error at line ${lineNumber}: ${message}\nLine: ${lineContent}`
+    );
+    this.name = "ParseError";
+    this.lineNumber = lineNumber;
+    this.lineContent = lineContent;
+  }
+}
 
 /**
  * Decodes Shift-JIS buffer to UTF-8 string
@@ -26,28 +94,18 @@ export function decodeShiftJIS(buffer: ArrayBuffer): string {
 }
 
 /**
- * Represents a preprocessed line with original line number tracking
- */
-export type PreprocessedLine = {
-  /** Line content (with _ removed if it was a continuation line) */
-  content: string;
-  /** Original line number in the source file (1-based) */
-  lineNumber: number;
-  /** Whether this line continues to the next line (had _ at the end) */
-  isContinuation: boolean;
-};
-
-/**
  * Splits text into lines and performs preprocessing
  * - Removes empty lines
  * - Removes comment lines (starting with #)
  * - Removes inline comments (after //)
  * - Tracks original line numbers for accurate error reporting
+ * - Preserves whitespace at continuation boundaries for proper joining
  * - Does NOT merge line continuations (handled by getLogicalLine)
  */
 export function preprocessLines(text: string): PreprocessedLine[] {
   const rawLines = text.split(/\r?\n/);
   const processedLines: PreprocessedLine[] = [];
+  let previousWasContinuation = false;
 
   for (let i = 0; i < rawLines.length; i++) {
     let line = rawLines[i];
@@ -59,24 +117,37 @@ export function preprocessLines(text: string): PreprocessedLine[] {
       line = line.substring(0, commentIndex);
     }
 
-    // Trim whitespace
-    line = line.trim();
+    // Handle trimming based on continuation context
+    // - If previous line was continuation: preserve left side (trimEnd only)
+    // - Otherwise: trim both sides normally
+    if (previousWasContinuation) {
+      line = line.trimEnd();
+    } else {
+      line = line.trim();
+    }
 
-    // Skip empty lines
+    // Preserve empty lines as section delimiters (VB5 uses empty lines to separate data)
     if (line.length === 0) {
+      previousWasContinuation = false;
+      processedLines.push({
+        content: "",
+        lineNumber: lineNumber,
+        isContinuation: false,
+      });
       continue;
     }
 
     // Skip comment lines (starting with #)
     if (line.startsWith("#")) {
+      previousWasContinuation = false;
       continue;
     }
 
     // Check for line continuation
     const isContinuation = line.endsWith("_");
     if (isContinuation) {
-      // Remove _ and trailing spaces
-      line = line.substring(0, line.length - 1).trimEnd();
+      // Remove _ but preserve any whitespace before it
+      line = line.substring(0, line.length - 1);
     }
 
     processedLines.push({
@@ -84,26 +155,12 @@ export function preprocessLines(text: string): PreprocessedLine[] {
       lineNumber: lineNumber,
       isContinuation: isContinuation,
     });
+
+    previousWasContinuation = isContinuation;
   }
 
   return processedLines;
 }
-
-/**
- * Result of parsing a logical line (with continuations merged)
- */
-export type LogicalLineResult = {
-  /** Merged content of the logical line */
-  content: string;
-  /** Starting index in the preprocessed lines array */
-  startIndex: number;
-  /** Ending index in the preprocessed lines array (inclusive) */
-  endIndex: number;
-  /** Line number of the first physical line */
-  startLineNumber: number;
-  /** Line number of the last physical line */
-  endLineNumber: number;
-};
 
 /**
  * Gets a logical line (with continuations merged) starting at the given index
@@ -237,14 +294,6 @@ export function removeQuotes(str: string): string {
 }
 
 /**
- * Result type for numeric field parsing with optional warning
- */
-export interface ParseNumericResult {
-  value: number;
-  warning?: string;
-}
-
-/**
  * Parses an integer field, returns 0 if invalid or "-"
  *
  * If a decimal value is provided, it will be rounded using Math.round().
@@ -273,9 +322,11 @@ export function parseIntField(
 
   const num = parseFloat(field);
   if (isNaN(num)) {
-    return { value: 0 };
+    const warning = fieldName
+      ? `${fieldName}の設定が間違っています。`
+      : `整数値が必要なフィールドに不正な値が指定されています（${field}）。`;
+    return { value: 0, warning };
   }
-
   const rounded = Math.round(num);
 
   // Check if the original value had a decimal part
@@ -377,94 +428,12 @@ export function parseAdaptation(field: string): string {
 }
 
 /**
- * Error type for parser errors
+ * Converts Katakana string to Hiragana
+ * Used for default KanaName generation from Nickname (VB5 behavior)
  */
-export class ParseError extends Error {
-  public readonly lineNumber: number; // 1-based line number for display
-  public readonly lineContent: string;
-
-  constructor(
-    message: string,
-    lineNumber: number, // 1-based line number
-    lineContent: string
-  ) {
-    super(
-      `Parse error at line ${lineNumber}: ${message}\nLine: ${lineContent}`
-    );
-    this.name = "ParseError";
-    this.lineNumber = lineNumber;
-    this.lineContent = lineContent;
-  }
-}
-
-/**
- * Validation utilities
- */
-
-import { DEFAULTS, FORMAT } from "./constants";
-
-/**
- * Validates and clamps a number to a range
- */
-export function validateRange(
-  value: number,
-  min: number,
-  max: number,
-  fieldName: string
-): { value: number; warning?: string } {
-  if (value < min || value > max) {
-    return {
-      value: Math.max(min, Math.min(max, value)),
-      warning: `${fieldName}の値が範囲外です（${min}-${max}）。${Math.max(
-        min,
-        Math.min(max, value)
-      )}に設定されました。`,
-    };
-  }
-  return { value };
-}
-
-/**
- * Validates adaptation string (4 characters)
- */
-export function validateAdaptation(adaptation: string): {
-  value: string;
-  warning?: string;
-} {
-  if (adaptation.length !== FORMAT.ADAPTATION_LENGTH) {
-    return {
-      value: DEFAULTS.ADAPTATION,
-      warning: `地形適応の設定が間違っています（${FORMAT.ADAPTATION_LENGTH}文字必要）。${DEFAULTS.ADAPTATION}に設定されました。`,
-    };
-  }
-  return { value: adaptation };
-}
-
-/**
- * Validates bitmap filename
- */
-export function validateBitmap(bitmap: string): {
-  value: string;
-  warning?: string;
-} {
-  if (!bitmap.toLowerCase().endsWith(FORMAT.BITMAP_EXTENSION)) {
-    return {
-      value: DEFAULTS.BITMAP,
-      warning: `ビットマップの設定が間違っています（${FORMAT.BITMAP_EXTENSION}ファイルが必要）。${DEFAULTS.BITMAP}に設定されました。`,
-    };
-  }
-  return { value: bitmap };
-}
-
-/**
- * Validates that traits don't contain invalid Lv specifications
- */
-export function validateTraits(
-  traits: string,
-  itemName: string
-): string | null {
-  if (traits.includes("Lv")) {
-    return `${itemName}の属性のレベル指定が間違っています。`;
-  }
-  return null;
+export function katakanaToHiragana(str: string): string {
+  return str.replace(/[\u30a1-\u30f6]/g, function (match) {
+    const chr = match.charCodeAt(0) - 0x60;
+    return String.fromCharCode(chr);
+  });
 }

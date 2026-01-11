@@ -44,10 +44,10 @@ describe('parseIntField', () => {
     expect(result.warning).toBeUndefined();
   });
 
-  it('should return 0 for invalid values', () => {
+  it('should return 0 and a warning for invalid values', () => {
     const result = parseIntField('invalid', 'テスト');
     expect(result.value).toBe(0);
-    expect(result.warning).toBeUndefined();
+    expect(result.warning).toBeDefined();
   });
 });
 

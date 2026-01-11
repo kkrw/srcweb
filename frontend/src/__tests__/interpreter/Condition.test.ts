@@ -3,7 +3,7 @@ import {
   AtomCondition,
   OrCondition,
   parseCondition,
-} from "../Condition";
+} from "../../models/Condition";
 
 describe("Condition Parser", () => {
   it("should parse simple atom", () => {
