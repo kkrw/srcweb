@@ -7,27 +7,25 @@ export const FEATURES_P_07_GROWTH = {
     target: FeatureTarget.Pilot,
     effects: [],
     description:
-      "入手する経験値が`50%`増加します(素質にレベル指定をした場合は`10×素質レベル%`)。\nスペシャルパワーの「獲得経験値増加」の効果とは重複しません。\nスペシャルパワー側の効果が優先されます。\n(ただし「Option」コマンドで「収得効果重複」オプションが選択されている場合は重複します)",
+      "入手する経験値が50%増加する。;（レベル指定時は 10×素質レベル% 増加）",
   },
   SlowGrowth: {
     name: "遅成長",
     target: FeatureTarget.Pilot,
     effects: [],
-    description: "入手する経験値が半減します。",
+    description: "入手する経験値が半減する。",
   },
   SPHighGrowth: {
     name: "ＳＰ高成長",
     target: FeatureTarget.Pilot,
     effects: [],
-    description:
-      "レベルアップ時の最大ＳＰの増加量が`1.5倍`になります(レベル 40 まではレベル毎に 3 増加)。",
+    description: "レベルアップ時の最大ＳＰの増加量が通常の1.5倍に増加する。",
   },
   SPLowGrowth: {
     name: "ＳＰ低成長",
     target: FeatureTarget.Pilot,
     effects: [],
-    description:
-      "レベルアップ時の最大ＳＰの増加量が`半減`します(レベル 40 まではレベル毎に 1 増加)。",
+    description: "レベルアップ時の最大ＳＰの増加量が通常の半分に減少する。",
   },
   AdditionalLevel: {
     name: "追加レベル",

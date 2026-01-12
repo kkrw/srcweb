@@ -6,63 +6,54 @@ export const FEATURES_U_12_ENCHANCE = {
     name: "ＨＰ強化",
     target: FeatureTarget.Unit,
     effects: [],
-    description:
-      "書式 `ＨＰ強化Lv*[=別名 必要気力]`\nユニットの最大ＨＰが`200×レベル`増加します。",
+    description: "最大ＨＰを 200×ＨＰ強化レベル 増加。",
   },
   ENEnhance: {
     name: "ＥＮ強化",
     target: FeatureTarget.Unit,
     effects: [],
-    description:
-      "書式 `ＥＮ強化Lv*[=別名 必要気力]`\nユニットの最大ＥＮが`10×レベル`増加します。",
+    description: "最大ＥＮを 10×ＥＮ強化レベル 増加。",
   },
   ArmorEnhance: {
     name: "装甲強化",
     target: FeatureTarget.Unit,
     effects: [],
-    description:
-      "書式 `装甲強化Lv*[=別名 必要気力]`\nユニットの装甲が`100×レベル`増加します。",
+    description: "装甲を 100×装甲強化レベル 増加。",
   },
   MobilityEnhance: {
     name: "運動性強化",
     target: FeatureTarget.Unit,
     effects: [],
-    description:
-      "書式 `運動性強化Lv*[=別名 必要気力]`\nユニットの運動性が`5×レベル`増加します。",
+    description: "運動性を 5×運動性強化レベル 増加。",
   },
   MoveEnhance: {
     name: "移動力強化",
     target: FeatureTarget.Unit,
     effects: [],
-    description:
-      "書式 `移動力強化Lv*[=別名 必要気力]`\nユニットの移動力がレベル増加します。",
+    description: "移動力を 移動力強化レベル 増加。",
   },
   HPRateEnhance: {
     name: "ＨＰ割合強化",
     target: FeatureTarget.Unit,
     effects: [],
-    description:
-      "書式 `ＨＰ割合強化Lv*[=別名 必要気力]`\nユニットの最大ＨＰがユニットデータの`最大ＨＰ×レベル／20`増加します。",
+    description: "最大ＨＰを 5×ＨＰ割合強化レベル% 分増加。",
   },
   ENRateEnhance: {
     name: "ＥＮ割合強化",
     target: FeatureTarget.Unit,
     effects: [],
-    description:
-      "書式 `ＥＮ割合強化Lv*[=別名 必要気力]`\nユニットの最大ＥＮがユニットデータの`最大ＥＮ×レベル／20`増加します。",
+    description: "最大ＥＮを 5×ＥＮ割合強化レベル% 分増加。",
   },
   ArmorRateEnhance: {
     name: "装甲割合強化",
     target: FeatureTarget.Unit,
     effects: [],
-    description:
-      "書式 `装甲割合強化Lv*[=別名 必要気力]`\nユニットの装甲がユニットデータの`装甲×レベル／20`増加します。",
+    description: "装甲を 5×装甲割合強化レベル% 分増加。",
   },
   MobilityRateEnhance: {
     name: "運動性割合強化",
     target: FeatureTarget.Unit,
     effects: [],
-    description:
-      "書式 `運動性割合Lv*[=別名 必要気力]`\nユニットの運動性がユニットデータの`運動性×レベル／20`増加します。",
+    description: "運動性を 5×運動性割合強化レベル% 分増加。",
   },
 } as const satisfies Record<string, FeatureSpec>;

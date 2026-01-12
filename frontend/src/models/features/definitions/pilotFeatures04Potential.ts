@@ -16,7 +16,7 @@ export const FEATURES_P_04_POTENTIAL = {
       },
     ],
     description:
-      "ユニットの HP が 1/4 以下のとき、命中・回避率・クリティカル率が 30% 上昇します。",
+      "ＨＰが最大ＨＰの1/4以下の時に発動。;命中＆回避 +30%、クリティカル発生率 +50%。",
     mainPilotOnly: true,
   },
   SuperPotential: {
@@ -24,7 +24,7 @@ export const FEATURES_P_04_POTENTIAL = {
     target: FeatureTarget.Pilot,
     effects: [],
     description:
-      "ユニットのＨＰが最大ＨＰの`1/4`以下のときに発動します。\n命中率と回避率が`50%`アップするとともに、クリティカル発生率が`50%`アップします。",
+      "ＨＰが最大ＨＰの1/4以下の時に発動。;命中＆回避 +50%、クリティカル発生率 +50%。",
     mainPilotOnly: true,
   },
   Resolve: {
@@ -32,7 +32,7 @@ export const FEATURES_P_04_POTENTIAL = {
     target: FeatureTarget.Pilot,
     effects: [],
     description:
-      "ユニットのＨＰが最大ＨＰの`1/4`以下のときに発動します。\nダメージ計算時に攻撃力が`1.2倍`になるとともに、クリティカル発生率が`50%`アップします。\n底力(超底力)と異なり、命中率＆回避率アップの効果はありません。",
+      "ＨＰが最大ＨＰの1/4以下の時に発動。;攻撃力1.2倍、クリティカル発生率 +50%。",
     mainPilotOnly: true,
   },
   Indomitable: {
@@ -40,7 +40,7 @@ export const FEATURES_P_04_POTENTIAL = {
     target: FeatureTarget.Pilot,
     effects: [],
     description:
-      "ユニットのＨＰが最大ＨＰの`1/2`以下のときに発動し、損傷率に応じてダメージ計算における装甲値がアップします。\n\n|    損傷率 | ダメージ計算における装甲値 |\n| --------: | -------------------------: |\n|   50%以上 |                     1.1 倍 |\n|   75%以上 |                     1.2 倍 |\n| 87.5%以上 |                     1.3 倍 |",
+      "ＨＰが最大ＨＰの1/2以下の時に発動。;損傷率に応じて防御力が増加する。",
     mainPilotOnly: true,
   },
   Comeback: {
@@ -48,7 +48,7 @@ export const FEATURES_P_04_POTENTIAL = {
     target: FeatureTarget.Pilot,
     effects: [],
     description:
-      "ＨＰ、ＥＮ、ＳＰの全てが最大値の`20%`以下になると毎ターン最初に発動し、ＨＰ、ＥＮ、ＳＰが全快します。",
+      "ＳＰ、ＨＰ、ＥＮの全てが最大値の20%以下になると毎ターン最初に発動。;ＳＰ、ＨＰ、ＥＮが全快する。",
     mainPilotOnly: true,
   },
 } as const satisfies Record<string, FeatureSpec>;
