@@ -1,9 +1,18 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeAll, afterAll } from "vitest";
 import { parseMapFile } from "../../parsers/mapParser";
+import { terrainRepository } from "../../repositories/TerrainRepository";
 
 describe("Map Parser", () => {
+  beforeAll(() => {
+    const terrainFilePath = join(__dirname, "fixtures", "sample_terrain.txt");
+    terrainRepository.load([terrainFilePath]);
+  });
+
+  afterAll(() => {
+    terrainRepository.clear();
+  });
   // ==========================================================================
   // 新形式マップ（基本）
   // ==========================================================================
@@ -40,24 +49,28 @@ describe("Map Parser", () => {
       const cell11 = result.data.cells.find((c) => c.x === 1 && c.y === 1);
       expect(cell11).toBeDefined();
       expect(cell11!.terrain.id).toBe(0);
+      expect(cell11!.terrain.name).toBe("平地");
       expect(cell11!.bitmapNo).toBe(0);
 
       // (x=1, y=3)
       const cell13 = result.data.cells.find((c) => c.x === 1 && c.y === 3);
       expect(cell13).toBeDefined();
       expect(cell13!.terrain.id).toBe(0);
+      expect(cell13!.terrain.name).toBe("平地");
       expect(cell13!.bitmapNo).toBe(2);
 
       // (x=2, y=1)
       const cell21 = result.data.cells.find((c) => c.x === 2 && c.y === 1);
       expect(cell21).toBeDefined();
       expect(cell21!.terrain.id).toBe(11);
+      expect(cell21!.terrain.name).toBe("林");
       expect(cell21!.bitmapNo).toBe(0);
 
       // (x=3, y=3)
       const cell33 = result.data.cells.find((c) => c.x === 3 && c.y === 3);
       expect(cell33).toBeDefined();
       expect(cell33!.terrain.id).toBe(17);
+      expect(cell33!.terrain.name).toBe("海");
       expect(cell33!.bitmapNo).toBe(2);
     });
 
@@ -192,18 +205,21 @@ describe("Map Parser", () => {
       const cell11 = result.data.cells.find((c) => c.x === 1 && c.y === 1);
       expect(cell11).toBeDefined();
       expect(cell11!.terrain.id).toBe(0);
+      expect(cell11!.terrain.name).toBe("平地");
       expect(cell11!.bitmapNo).toBe(0);
 
       // (x=1, y=20)
       const cell1_20 = result.data.cells.find((c) => c.x === 1 && c.y === 20);
       expect(cell1_20).toBeDefined();
       expect(cell1_20!.terrain.id).toBe(0);
+      expect(cell1_20!.terrain.name).toBe("平地");
       expect(cell1_20!.bitmapNo).toBe(19);
 
       // (x=20, y=20)
       const cell20_20 = result.data.cells.find((c) => c.x === 20 && c.y === 20);
       expect(cell20_20).toBeDefined();
       expect(cell20_20!.terrain.id).toBe(19);
+      expect(cell20_20!.terrain.name).toBe("川");
       expect(cell20_20!.bitmapNo).toBe(19);
     });
   });

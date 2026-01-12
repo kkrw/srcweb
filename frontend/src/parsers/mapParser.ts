@@ -19,6 +19,7 @@
 import type { MapCell, MapData } from "../models";
 import { createMapCell, createMapData } from "../models";
 import type { Float, Integer } from "../models/BrandedTypes";
+import { terrainRepository } from "../repositories/TerrainRepository";
 import { ERROR_MESSAGES } from "./messages";
 import { type ParseResult, ParseError } from "./ParseResult";
 
@@ -145,24 +146,49 @@ export function parseMapFile(
           return { success: false, error: cellResult.error };
         }
 
-        cells.push(
-          createMapCell({
-            x,
-            y,
-            terrain: {
-              id: cellResult.data.terrainType as Integer,
-              name: "",
-              graphicFileNamePrefix: "",
-              type: "陸",
-              cost: 1 as Float,
-              features: [],
-            },
-            bitmapNo: cellResult.data.bitmapNo,
-            layerTerrainID: null,
-            layerBitmapNo: null,
-            boxType: BOX_TYPE.UNDER,
-          })
-        );
+        const terrainId = cellResult.data.terrainType;
+        const terrainTemplate = terrainRepository.getById(terrainId);
+
+        if (!terrainTemplate) {
+          warnings.push(
+            `[${filePath}] 地形ID ${terrainId} が地形データに見つかりません (行 ${
+              lineIndex + 1
+            })。デフォルト値が使用されます。`
+          );
+          // Push a default/fallback terrain
+          cells.push(
+            createMapCell({
+              x,
+              y,
+              terrain: {
+                // Fallback terrain
+                id: terrainId as Integer,
+                name: `不明な地形(${terrainId})`,
+                graphicFileNamePrefix: "",
+                type: "陸",
+                cost: 1 as Float,
+                features: [],
+              },
+              bitmapNo: cellResult.data.bitmapNo,
+              layerTerrainID: null,
+              layerBitmapNo: null,
+              boxType: BOX_TYPE.UNDER,
+            })
+          );
+        } else {
+          // Found the terrain, use it
+          cells.push(
+            createMapCell({
+              x,
+              y,
+              terrain: terrainTemplate,
+              bitmapNo: cellResult.data.bitmapNo,
+              layerTerrainID: null,
+              layerBitmapNo: null,
+              boxType: BOX_TYPE.UNDER,
+            })
+          );
+        }
 
         lineIndex++;
       }
