@@ -3,12 +3,13 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { PERSONALITY } from "../../parsers/constants";
 import { parsePilotFile } from "../../parsers/pilotParser";
+import { decodeShiftJIS } from "../../parsers/utils";
 
 describe("Pilot Parser", () => {
-  const samplePilotText = readFileSync(
-    join(__dirname, "fixtures", "sample_pilot.txt"),
-    "utf-8"
+  const samplePilotBuffer = readFileSync(
+    join(__dirname, "fixtures", "sample_pilot.txt")
   );
+  const samplePilotText = decodeShiftJIS(samplePilotBuffer);
 
   describe("parsePilotFile - 正常パース", () => {
     it("should successfully parse all 61 pilot data entries", () => {

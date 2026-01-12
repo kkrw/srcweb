@@ -4,9 +4,8 @@ import { describe, expect, it } from "vitest";
 import { parsePilotFile } from "../../parsers/pilotParser";
 
 describe("Pilot Parser", () => {
-  const samplePilotText = readFileSync(
-    join(__dirname, "fixtures", "sample_pilot.txt"),
-    "utf-8"
+  const samplePilotText = decodeShiftJIS(
+    readFileSync(join(__dirname, "fixtures", "sample_pilot.txt"))
   );
 
   // ==========================================================================

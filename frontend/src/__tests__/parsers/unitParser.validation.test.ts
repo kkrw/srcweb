@@ -3,6 +3,7 @@ import { join } from "path";
 import { describe, expect, it } from "vitest";
 import { ParseError } from "../../parsers/ParseResult";
 import { parseUnitFile } from "../../parsers/unitParser";
+import { decodeShiftJIS } from "../../parsers/utils";
 import { findFeatureByName } from "./testHelpers";
 
 const fixturesDir = join(__dirname, "fixtures");
@@ -11,10 +12,10 @@ describe("Unit Parser - Validation Tests", () => {
   describe("Fatal Errors", () => {
     // Test1
     it("Test1: should fail on unit name with half-width space and provide detailed error", () => {
-      const text = readFileSync(
-        join(fixturesDir, "invalid_unit_errors", "01_name_with_space.txt"),
-        "utf-8"
+      const buffer = readFileSync(
+        join(fixturesDir, "invalid_unit_errors", "01_name_with_space.txt")
       );
+      const text = decodeShiftJIS(buffer);
       const result = parseUnitFile(text, "01_name_with_space.txt");
 
       expect(result.success).toBe(false);
@@ -29,14 +30,14 @@ describe("Unit Parser - Validation Tests", () => {
 
     // Test2
     it("Test2: should fail on unit name with full-width parentheses and provide detailed error", () => {
-      const text = readFileSync(
+      const buffer = readFileSync(
         join(
           fixturesDir,
           "invalid_unit_errors",
           "02_name_with_fullwidth_paren.txt"
-        ),
-        "utf-8"
+        )
       );
+      const text = decodeShiftJIS(buffer);
       const result = parseUnitFile(text, "02_name_with_fullwidth_paren.txt");
 
       expect(result.success).toBe(false);
@@ -51,10 +52,10 @@ describe("Unit Parser - Validation Tests", () => {
 
     // Test3
     it("Test3: should fail on unit name with double quote and provide detailed error", () => {
-      const text = readFileSync(
-        join(fixturesDir, "invalid_unit_errors", "03_name_with_quote.txt"),
-        "utf-8"
+      const buffer = readFileSync(
+        join(fixturesDir, "invalid_unit_errors", "03_name_with_quote.txt")
       );
+      const text = decodeShiftJIS(buffer);
       const result = parseUnitFile(text, "03_name_with_quote.txt");
 
       expect(result.success).toBe(false);
@@ -69,10 +70,10 @@ describe("Unit Parser - Validation Tests", () => {
 
     // Test4
     it("Test4: should fail on insufficient commas in params line and provide detailed error", () => {
-      const text = readFileSync(
-        join(fixturesDir, "invalid_unit_errors", "04_insufficient_commas.txt"),
-        "utf-8"
+      const buffer = readFileSync(
+        join(fixturesDir, "invalid_unit_errors", "04_insufficient_commas.txt")
       );
+      const text = decodeShiftJIS(buffer);
       const result = parseUnitFile(text, "04_insufficient_commas.txt");
 
       expect(result.success).toBe(false);
@@ -86,10 +87,10 @@ describe("Unit Parser - Validation Tests", () => {
 
     // Test5
     it("Test5: should fail on too many commas in params line and provide detailed error", () => {
-      const text = readFileSync(
-        join(fixturesDir, "invalid_unit_errors", "05_too_many_commas.txt"),
-        "utf-8"
+      const buffer = readFileSync(
+        join(fixturesDir, "invalid_unit_errors", "05_too_many_commas.txt")
       );
+      const text = decodeShiftJIS(buffer);
       const result = parseUnitFile(text, "05_too_many_commas.txt");
 
       expect(result.success).toBe(false);
@@ -103,14 +104,14 @@ describe("Unit Parser - Validation Tests", () => {
 
     // Test6
     it("Test6: should fail on missing movement parameters and provide detailed error", () => {
-      const text = readFileSync(
+      const buffer = readFileSync(
         join(
           fixturesDir,
           "invalid_unit_errors",
           "06_missing_movement_params.txt"
-        ),
-        "utf-8"
+        )
       );
+      const text = decodeShiftJIS(buffer);
       const result = parseUnitFile(text, "06_missing_movement_params.txt");
 
       expect(result.success).toBe(false);
@@ -124,10 +125,10 @@ describe("Unit Parser - Validation Tests", () => {
 
     // Test7
     it("Test7: should fail on missing stats parameters and provide detailed error", () => {
-      const text = readFileSync(
-        join(fixturesDir, "invalid_unit_errors", "07_missing_stats_params.txt"),
-        "utf-8"
+      const buffer = readFileSync(
+        join(fixturesDir, "invalid_unit_errors", "07_missing_stats_params.txt")
       );
+      const text = decodeShiftJIS(buffer);
       const result = parseUnitFile(text, "07_missing_stats_params.txt");
 
       expect(result.success).toBe(false);
@@ -141,14 +142,14 @@ describe("Unit Parser - Validation Tests", () => {
 
     // Test8
     it("Test8: should fail on missing ability section and provide detailed error", () => {
-      const text = readFileSync(
+      const buffer = readFileSync(
         join(
           fixturesDir,
           "invalid_unit_errors",
           "08_missing_ability_section.txt"
-        ),
-        "utf-8"
+        )
       );
+      const text = decodeShiftJIS(buffer);
       const result = parseUnitFile(text, "08_missing_ability_section.txt");
 
       expect(result.success).toBe(false);
@@ -162,14 +163,14 @@ describe("Unit Parser - Validation Tests", () => {
 
     // Test9
     it("Test9: should fail on missing weapon parameters and provide detailed error", () => {
-      const text = readFileSync(
+      const buffer = readFileSync(
         join(
           fixturesDir,
           "invalid_unit_errors",
           "09_missing_weapon_params.txt"
-        ),
-        "utf-8"
+        )
       );
+      const text = decodeShiftJIS(buffer);
       const result = parseUnitFile(text, "09_missing_weapon_params.txt");
 
       expect(result.success).toBe(false);
@@ -183,14 +184,14 @@ describe("Unit Parser - Validation Tests", () => {
 
     // Test10
     it("Test10: should fail on missing ability parameters and provide detailed error", () => {
-      const text = readFileSync(
+      const buffer = readFileSync(
         join(
           fixturesDir,
           "invalid_unit_errors",
           "10_missing_ability_params.txt"
-        ),
-        "utf-8"
+        )
       );
+      const text = decodeShiftJIS(buffer);
       const result = parseUnitFile(text, "10_missing_ability_params.txt");
 
       expect(result.success).toBe(false);
@@ -204,12 +205,13 @@ describe("Unit Parser - Validation Tests", () => {
   });
 
   describe("Warnings (Non-Fatal Errors)", () => {
+    const warningsBuffer = readFileSync(
+      join(fixturesDir, "invalid_unit_warnings.txt")
+    );
+    const warningsText = decodeShiftJIS(warningsBuffer);
+
     it("should parse with warnings for invalid values", () => {
-      const text = readFileSync(
-        join(fixturesDir, "invalid_unit_warnings.txt"),
-        "utf-8"
-      );
-      const result = parseUnitFile(text, "invalid_unit_warnings.txt");
+      const result = parseUnitFile(warningsText, "invalid_unit_warnings.txt");
 
       expect(result.success).toBe(true);
       expect(result.warnings).toBeDefined();
@@ -227,11 +229,7 @@ describe("Unit Parser - Validation Tests", () => {
     });
 
     it("should apply default values for invalid numeric unit class", () => {
-      const text = readFileSync(
-        join(fixturesDir, "invalid_unit_warnings.txt"),
-        "utf-8"
-      );
-      const result = parseUnitFile(text, "invalid_unit_warnings.txt");
+      const result = parseUnitFile(warningsText, "invalid_unit_warnings.txt");
 
       if (result.success) {
         const unit = result.data.find((u) => u.name === "数値クラス");
@@ -250,11 +248,7 @@ describe("Unit Parser - Validation Tests", () => {
     });
 
     it("should apply default values for invalid size", () => {
-      const text = readFileSync(
-        join(fixturesDir, "invalid_unit_warnings.txt"),
-        "utf-8"
-      );
-      const result = parseUnitFile(text, "invalid_unit_warnings.txt");
+      const result = parseUnitFile(warningsText, "invalid_unit_warnings.txt");
 
       if (result.success) {
         const unit = result.data.find((u) => u.name === "無効サイズ");
@@ -273,11 +267,7 @@ describe("Unit Parser - Validation Tests", () => {
     });
 
     it("should handle invalid pilot capacity with warning", () => {
-      const text = readFileSync(
-        join(fixturesDir, "invalid_unit_warnings.txt"),
-        "utf-8"
-      );
-      const result = parseUnitFile(text, "invalid_unit_warnings.txt");
+      const result = parseUnitFile(warningsText, "invalid_unit_warnings.txt");
 
       if (result.success) {
         const unit = result.data.find((u) => u.name === "非数値パイロット");
@@ -296,10 +286,10 @@ describe("Unit Parser - Validation Tests", () => {
   });
 
   describe("Boundary Value Tests", () => {
-    const boundaryText = readFileSync(
-      join(fixturesDir, "boundary_unit.txt"),
-      "utf-8"
+    const boundaryBuffer = readFileSync(
+      join(fixturesDir, "boundary_unit.txt")
     );
+    const boundaryText = decodeShiftJIS(boundaryBuffer);
 
     it("should accept minimum values", () => {
       const result = parseUnitFile(boundaryText, "boundary_unit.txt");

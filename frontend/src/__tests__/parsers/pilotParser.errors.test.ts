@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { ParseError } from "../../parsers/ParseResult";
 import { parsePilotFile } from "../../parsers/pilotParser";
-import { ParseError } from "../../parsers/utils";
+import { decodeShiftJIS } from "../../parsers/utils";
 
 describe("Pilot Parser", () => {
   // ==========================================================================
@@ -10,9 +11,8 @@ describe("Pilot Parser", () => {
   // ==========================================================================
   describe("エラーケース", () => {
     const readErrorFile = (filename: string): string => {
-      return readFileSync(
-        join(__dirname, "fixtures", "error_pilots", filename),
-        "utf-8"
+      return decodeShiftJIS(
+        readFileSync(join(__dirname, "fixtures", "error_pilots", filename))
       );
     };
 

@@ -3,11 +3,11 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { PERSONALITY } from "../../parsers/constants";
 import { parsePilotFile } from "../../parsers/pilotParser";
+import { decodeShiftJIS } from "../../parsers/utils";
 
 describe("Pilot Parser", () => {
-  const samplePilotText = readFileSync(
-    join(__dirname, "fixtures", "sample_pilot.txt"),
-    "utf-8"
+  const samplePilotText = decodeShiftJIS(
+    readFileSync(join(__dirname, "fixtures", "sample_pilot.txt"))
   );
 
   // ==========================================================================

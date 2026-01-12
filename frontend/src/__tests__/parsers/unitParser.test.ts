@@ -12,16 +12,17 @@ import {
   OrCondition,
 } from "../../models/Condition";
 import { parseUnitFile } from "../../parsers/unitParser";
+import { decodeShiftJIS } from "../../parsers/utils";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 describe("Unit Parser", () => {
   const fixturesPath = join(__dirname, "fixtures");
-  const sampleUnitText = readFileSync(
-    join(fixturesPath, "sample_unit.txt"),
-    "utf-8"
+  const sampleUnitBuffer = readFileSync(
+    join(fixturesPath, "sample_unit.txt")
   );
+  const sampleUnitText = decodeShiftJIS(sampleUnitBuffer);
 
   // ==========================================================================
   // 初期パースと基本検証

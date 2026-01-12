@@ -9,15 +9,15 @@ import {
 } from "../../models/Condition";
 import { FEATURES } from "../../models/features/definitions";
 import { parseUnitFile } from "../../parsers/unitParser";
+import { decodeShiftJIS } from "../../parsers/utils";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 describe("Unit Parser", () => {
   const fixturesPath = join(__dirname, "fixtures");
-  const sampleUnitText = readFileSync(
-    join(fixturesPath, "sample_unit.txt"),
-    "utf-8"
+  const sampleUnitText = decodeShiftJIS(
+    readFileSync(join(fixturesPath, "sample_unit.txt"))
   );
 
   describe("parseUnitFile", () => {
