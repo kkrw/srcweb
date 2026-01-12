@@ -1,0 +1,118 @@
+import { type FeatureSpec, FeatureTarget } from "../types";
+
+// ### パイロット関連特殊能力
+export const FEATURES_U_07_PILOT = {
+  AddPilot: {
+    name: "追加パイロット",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "特定の形態でのみ有効な追加パイロットを指定。",
+    visible: false,
+  },
+  BerserkPilot: {
+    name: "暴走時パイロット",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "暴走時のみ有効な追加パイロットを指定。",
+    visible: false,
+  },
+  AddSupport: {
+    name: "追加サポート",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "特定の形態でのみ有効な追加サポートパイロットを指定。",
+    visible: false,
+  },
+  PilotNickname: {
+    name: "パイロット愛称",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "メインパイロットの愛称を指定したものに変更。",
+    visible: false,
+  },
+  PilotPhonetic: {
+    name: "パイロット読み仮名",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "メインパイロットの読み仮名を指定したものに変更。",
+    visible: false,
+  },
+  PilotImage: {
+    name: "パイロット画像",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "メインパイロットの画像を指定したファイルに変更。",
+    visible: false,
+  },
+  ChangePersonality: {
+    name: "性格変更",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "メインパイロットの性格を指定したものに変更。",
+    visible: false,
+  },
+  Gender: {
+    name: "性別",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "メインパイロットの性別を変更。",
+    visible: false,
+  },
+  MeleeEnhance: {
+    name: "格闘強化",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "パイロットの格闘を+ 5×格闘強化レベル。",
+  },
+  RangedEnhance: {
+    name: "射撃強化",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "パイロットの射撃を+ 5×射撃強化レベル。",
+  },
+  HitEnhance: {
+    name: "命中強化",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "パイロットの命中を+ 5×命中強化レベル。",
+  },
+  EvasionEnhance: {
+    name: "回避強化",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "パイロットの回避を+ 5×回避強化レベル。",
+  },
+  SkillEnhance: {
+    name: "技量強化",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "パイロットの技量を+ 5×技量強化レベル。",
+  },
+  ReactionEnhance: {
+    name: "反応強化",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "パイロットの反応を+ 5×反応強化レベル。",
+  },
+  PilotTerrainAdaptation: {
+    name: "パイロット地形適応変更",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "パイロットの地形適応を指定した段階数だけ変更。",
+    visible: false,
+  },
+  AddPilotAbility: {
+    name: "パイロット能力付加",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "メインパイロットに指定した特殊能力を付加。",
+    visible: false,
+  },
+  EnhancePilotAbility: {
+    name: "パイロット能力強化",
+    target: FeatureTarget.Unit,
+    effects: [],
+    description: "メインパイロットの特殊能力レベルを指定した分だけ増加。",
+    visible: false,
+  },
+} as const satisfies Record<string, FeatureSpec>;

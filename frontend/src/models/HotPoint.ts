@@ -7,32 +7,32 @@ export interface HotPoint {
   /**
    * ホットポイントの識別名
    */
-  Name: string;
+  name: string;
 
   /**
    * X座標（左端）
    */
-  Left: number;
+  left: number;
 
   /**
    * Y座標（上端）
    */
-  Top: number;
+  top: number;
 
   /**
    * 幅
    */
-  Width: number;
+  width: number;
 
   /**
    * 高さ
    */
-  Height: number;
+  height: number;
 
   /**
    * ツールチップ等に表示する名称
    */
-  Caption: string;
+  caption: string;
 }
 
 /**
@@ -40,11 +40,11 @@ export interface HotPoint {
  */
 export function createHotPoint(params: Partial<HotPoint> = {}): HotPoint {
   return {
-    Name: params.Name || "",
-    Left: params.Left || 0,
-    Top: params.Top || 0,
-    Width: params.Width || 0,
-    Height: params.Height || 0,
-    Caption: params.Caption || "",
+    name: params.name || "",
+    left: params.left || 0,
+    top: params.top || 0,
+    width: params.width || 0,
+    height: params.height || 0,
+    caption: params.caption || "",
   };
 }

@@ -9,17 +9,17 @@ export interface SpecialPower {
    * スペシャルパワーの名称
    * 例: "熱血", "必中", "加速"
    */
-  Name: string;
+  name: string;
 
   /**
    * 習得するパイロットレベル
    */
-  RequiredLevel: number;
+  requiredLevel: number;
 
   /**
    * 使用に必要なSP消費量
    */
-  SPCost: number;
+  spCost?: number;
 }
 
 /**
@@ -27,8 +27,8 @@ export interface SpecialPower {
  */
 export function createSpecialPower(params: Partial<SpecialPower> = {}): SpecialPower {
   return {
-    Name: params.Name || "",
-    RequiredLevel: params.RequiredLevel || 1,
-    SPCost: params.SPCost || 0,
+    name: params.name || "",
+    requiredLevel: params.requiredLevel || 1,
+    spCost: params.spCost || 0,
   };
 }

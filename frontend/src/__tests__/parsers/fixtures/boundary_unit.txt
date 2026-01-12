@@ -1,0 +1,130 @@
+# Unit Data - Boundary Value Tests
+# Tests minimum and maximum values for numeric fields
+
+## Test 1: Minimum values (all should be OK)
+最小値
+最小値, さいしょうち, テスト機, 1, 0
+陸, 0, SS, 0, 0
+特殊能力なし
+0, 0, 0, 0
+----, test.bmp
+最小武器, 0, 1, 1, -999, 0, 0, 0, ----, -999, -
+===
+最小アビリティ, 回復Lv0, 0, 0, 0, 0, -
+
+## Test 2: Maximum values (all should be OK, values may be clamped)
+最大値
+最大値, さいだいち, テスト機, 99, 99
+陸, 99, S, 9999999, 9999
+特殊能力
+シールドLv100
+ＨＰ回復Lv100
+9999999, 9999, 99999, 9999
+SSSS, test.bmp
+最大武器, 99999, 1, 99, +999, 99, 999, 1000, AAAA, +999, -
+===
+最大アビリティ, 回復Lv100, 99, 99, 999, 1000, -
+
+## Test 3: Over maximum values (values should be clamped to max for unit stats)
+超過最大値
+超過最大値, ちょうかさいだいち, テスト機, 100, 100
+陸, 100, M, 10000000, 10000
+特殊能力
+シールドLv1000
+10000000, 10000, 100000, 10000
+BBBB, test.bmp
+超過武器, 100000, 1, 100, +1000, 100, 1000, 1001, BBBB, +1000, -
+===
+超過アビリティ, 回復Lv1000, 100, 100, 1000, 1001, -
+
+## Test 4: Under minimum values for range fields (should be clamped or produce warning)
+未満最小値範囲
+未満最小値, みまんさいしょう, テスト機, 0, -1
+陸, -1, L, -1, -1
+特殊能力
+ＨＰ回復Lv-10
+-1, -1, -1, -1
+CCCC, test.bmp
+未満武器, -1, 0, 0, -1000, -1, -1, -1, CCCC, -1000, -
+===
+未満アビリティ, 回復Lv-10, -1, -1, -1, -1, -
+
+## Test 5: Negative values in fields that allow negatives (Precision and Critical)
+負数許可
+負数許可, ふすうきょか, テスト機, 1, 0
+陸, 4, LL, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+DDDD, test.bmp
+負数武器, 1000, 1, 1, -500, -, -, -, DDDD, -500, -
+
+## Test 6: All valid sizes
+全サイズ
+全サイズ, ぜんさいず, テスト機, 1, 0
+陸, 4, XL, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+EEEE, test.bmp
+
+## Test 7: All adaptation ranks (-, E, D, C, B, A, S for each terrain)
+全地形適応
+全地形適応, ぜんちけいてきおう, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力なし
+2000, 100, 800, 80
+-EDC, test.bmp
+地形武器1, 1000, 1, 1, +0, -, -, -, BAS-, +0, -
+地形武器2, 1000, 1, 1, +0, -, -, -, EDCB, +0, -
+地形武器3, 1000, 1, 1, +0, -, -, -, ASDC, +0, -
+
+## Test 8: Decimal values in numeric fields (should be rounded to integers for ints, kept as decimals for doubles)
+実数値
+実数値, じっすうち, テスト機, 1, 0
+陸, 4.5, M, 2000.5, 50.5
+特殊能力
+シールドLv3.7
+ＨＰ回復Lv2.3
+2000.5, 100.7, 800.3, 80.9
+AAAA, test.bmp
+実数武器, 1000.4, 1.5, 1.5, +5, 10.6, 30.2, 110.5, AAAA, +10.5, 気L1.4
+===
+実数アビリティ, 回復Lv2.8, 5.8, 10.3, 50.7, 120.1, 気L1.4
+
+## Test 9: Decimal values with .5 (tests rounding behavior)
+実数丸め
+実数丸め, じっすうまるめ, テスト機, 1, 0
+陸, 4.5, M, 2000.5, 50.5
+特殊能力
+バリアLv4.5=特殊バリア
+ＥＮ回復Lv3.5
+2999.5, 99.5, 999.5, 99.5
+AAAA, test.bmp
+丸め武器, 1999.5, 1.5, 1.5, +0.5, 9.5, 99.5, 100.5, AAAA, +0.5, 武気L2.5
+===
+丸めアビリティ, 付加Lv1.5="回復Lv2.5" 回復Lv1.5, 9.5, 9.5, 99.5, 100.5, 気L2.5
+
+## Test 10: Negative decimal values (where negatives are allowed)
+負実数
+負実数, ふじっすう, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力
+ＨＰ回復Lv-2.7
+ＥＮ回復Lv-1.3
+2000, 100, 800, 80
+AAAA, test.bmp
+負実数武器, 1000, 1, 1, -15.7, -, -, -, AAAA, -20.3, 気L-0.8
+===
+負実数アビリティ, 付加Lv-1.2="回復Lv-3.8", 5, 10, 50, 100, -
+
+## Test 11: Very large feature levels (no upper limit)
+超大レベル
+超大レベル, ちょうだいれべる, テスト機, 1, 0
+陸, 4, M, 2000, 50
+特殊能力
+シールドLv9999
+ＨＰ回復Lv10000
+2000, 100, 800, 80
+AAAA, test.bmp
+超大武器, 1000, 1, 1, +0, -, -, -, AAAA, +0, 気L999
+===
+超大アビリティ, 付加Lv5000="回復Lv9999", 5, 10, 50, 100, -

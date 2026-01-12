@@ -1,3 +1,6 @@
+import { TERRAIN_UNKNOWN } from "./map/constants";
+import type { Terrain } from "./map/types";
+
 /**
  * マップのセル（タイル）のデータモデル
  *
@@ -7,40 +10,40 @@ export interface MapCell {
   /**
    * X座標
    */
-  X: number;
+  x: number;
 
   /**
    * Y座標
    */
-  Y: number;
+  y: number;
 
   /**
    * 地形ID
    */
-  TerrainID: number;
+  terrain: Terrain;
 
   /**
    * 地形画像のバリエーション番号
    */
-  BitmapNo: number;
+  bitmapNo: number;
 
   /**
    * 上層レイヤーの地形ID
    * null または 0 の場合は上層なし
    */
-  LayerTerrainID: number | null;
+  layerTerrainID: number | null;
 
   /**
    * 上層レイヤー画像番号
    * null または 0 の場合は上層なし
    */
-  LayerBitmapNo: number | null;
+  layerBitmapNo: number | null;
 
   /**
    * マスの属性
    * 上層/下層/画像のみ等の区分
    */
-  BoxType: number;
+  boxType: number;
 }
 
 /**
@@ -53,43 +56,43 @@ export interface MapData {
    * マップファイル名
    * 現在読み込まれているマップ定義ファイル（.map）のパス
    */
-  MapFileName: string;
+  mapFileName: string;
 
   /**
    * マップ横幅
    * マップのグリッド数（X軸）
    */
-  Width: number;
+  width: number;
 
   /**
    * マップ縦幅
    * マップのグリッド数（Y軸）
    */
-  Height: number;
+  height: number;
 
   /**
    * マップセルの配列
    * 全てのマップセル（タイル）の情報を保持します
    */
-  Cells: MapCell[];
+  cells: MapCell[];
 
   /**
    * 描画モード
    * 例: "夜", "夕焼け", "セピア" 等の画面効果状態
    */
-  DrawMode: string;
+  drawMode: string;
 
   /**
    * フィルタ色
    * 画面全体にかけるフィルタの色コード
    */
-  FilterColor: number;
+  filterColor: number;
 
   /**
    * フィルタ透過度
    * フィルタの強さ（0-100%）
    */
-  FilterTransparency: number;
+  filterTransparency: number;
 }
 
 /**
@@ -97,13 +100,13 @@ export interface MapData {
  */
 export function createMapCell(params: Partial<MapCell> = {}): MapCell {
   return {
-    X: params.X || 0,
-    Y: params.Y || 0,
-    TerrainID: params.TerrainID || 0,
-    BitmapNo: params.BitmapNo || 0,
-    LayerTerrainID: params.LayerTerrainID ?? null,
-    LayerBitmapNo: params.LayerBitmapNo ?? null,
-    BoxType: params.BoxType || 0,
+    x: params.x || 0,
+    y: params.y || 0,
+    terrain: params.terrain || TERRAIN_UNKNOWN,
+    bitmapNo: params.bitmapNo || 0,
+    layerTerrainID: params.layerTerrainID ?? null,
+    layerBitmapNo: params.layerBitmapNo ?? null,
+    boxType: params.boxType || 0,
   };
 }
 
@@ -112,13 +115,13 @@ export function createMapCell(params: Partial<MapCell> = {}): MapCell {
  */
 export function createMapData(params: Partial<MapData> = {}): MapData {
   return {
-    MapFileName: params.MapFileName || "",
-    Width: params.Width || 0,
-    Height: params.Height || 0,
-    Cells: params.Cells || [],
-    DrawMode: params.DrawMode || "",
-    FilterColor: params.FilterColor || 0,
-    FilterTransparency: params.FilterTransparency || 0,
+    mapFileName: params.mapFileName || "",
+    width: params.width || 0,
+    height: params.height || 0,
+    cells: params.cells || [],
+    drawMode: params.drawMode || "",
+    filterColor: params.filterColor || 0,
+    filterTransparency: params.filterTransparency || 0,
   };
 }
 
@@ -132,8 +135,12 @@ export function createMapData(params: Partial<MapData> = {}): MapData {
  * 2. Map<string, MapCell> (キー: `${x},${y}`) によるハッシュマップ
  * 3. Cells を Width × Height の固定長配列にして index = y * Width + x でアクセス
  */
-export function getCell(map: MapData, x: number, y: number): MapCell | undefined {
-  return map.Cells.find((cell) => cell.X === x && cell.Y === y);
+export function getCell(
+  map: MapData,
+  x: number,
+  y: number
+): MapCell | undefined {
+  return map.cells.find((cell) => cell.x === x && cell.y === y);
 }
 
 /**
@@ -144,10 +151,10 @@ export function getCell(map: MapData, x: number, y: number): MapCell | undefined
  * getCell() と同様に、二次元配列や Map による実装を検討してください。
  */
 export function setCell(map: MapData, cell: MapCell): void {
-  const index = map.Cells.findIndex((c) => c.X === cell.X && c.Y === cell.Y);
+  const index = map.cells.findIndex((c) => c.x === cell.x && c.y === cell.y);
   if (index !== -1) {
-    map.Cells[index] = cell;
+    map.cells[index] = cell;
   } else {
-    map.Cells.push(cell);
+    map.cells.push(cell);
   }
 }
