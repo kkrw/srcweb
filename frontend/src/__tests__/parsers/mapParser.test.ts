@@ -163,7 +163,10 @@ describe("Map Parser", () => {
     );
 
     it("旧形式マップを正しくパースできる", () => {
-      const result = parseMapFile(sampleMapText, "sample_map_legacy_format.map");
+      const result = parseMapFile(
+        sampleMapText,
+        "sample_map_legacy_format.map"
+      );
 
       expect(result.success).toBe(true);
       if (!result.success) return;
@@ -177,7 +180,10 @@ describe("Map Parser", () => {
     });
 
     it("旧形式マップのセル座標とデータが正しい", () => {
-      const result = parseMapFile(sampleMapText, "sample_map_legacy_format.map");
+      const result = parseMapFile(
+        sampleMapText,
+        "sample_map_legacy_format.map"
+      );
 
       expect(result.success).toBe(true);
       if (!result.success) return;
@@ -258,61 +264,6 @@ invalid_data
       if (result.success) return;
 
       expect(result.error.message).toContain("地形データ");
-    });
-  });
-
-  // ==========================================================================
-  // 実際のサンプルファイルでのテスト
-  // ==========================================================================
-  describe("実際のサンプルファイル", () => {
-    it("ガンバノンのマップファイルをパースできる", () => {
-      const sampleMapPath =
-        "D:/workspace/srcmig/samples/ganba/ガンバノン/Map/ganbanon-01.map";
-      let sampleMapText: string;
-      try {
-        sampleMapText = readFileSync(sampleMapPath, "utf-8");
-      } catch {
-        // ファイルが存在しない環境ではスキップ
-        return;
-      }
-
-      const result = parseMapFile(sampleMapText, "ganbanon-01.map");
-
-      expect(result.success).toBe(true);
-      if (!result.success) {
-        console.error("Parse error:", result.error);
-        return;
-      }
-
-      // ガンバノンの最初のマップは20x20
-      expect(result.data.width).toBe(20);
-      expect(result.data.height).toBe(20);
-      expect(result.data.cells).toHaveLength(400);
-    });
-
-    it("SHDのマップファイル（バージョン番号形式）をパースできる", () => {
-      const sampleMapPath =
-        "D:/workspace/srcmig/samples/SHD/超ヒロイン迷宮SRC/Map/1.map";
-      let sampleMapText: string;
-      try {
-        sampleMapText = readFileSync(sampleMapPath, "utf-8");
-      } catch {
-        // ファイルが存在しない環境ではスキップ
-        return;
-      }
-
-      const result = parseMapFile(sampleMapText, "1.map");
-
-      expect(result.success).toBe(true);
-      if (!result.success) {
-        console.error("Parse error:", result.error);
-        return;
-      }
-
-      // SHDの1.mapは15x15
-      expect(result.data.width).toBe(15);
-      expect(result.data.height).toBe(15);
-      expect(result.data.cells).toHaveLength(225);
     });
   });
 });

@@ -18,6 +18,41 @@ import { parseIntField, parseOptionalIntField } from "./utils";
 import { validateRange, validateTraits } from "./validators";
 
 /**
+ * Splits effect string by spaces, but respects double-quoted sections.
+ * Quoted sections are kept together even if they contain spaces.
+ *
+ * @param str - Effect string to split
+ * @returns Array of individual effect strings
+ */
+function splitEffectString(str: string): string[] {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      current += char;
+    } else if (char === " " && !inQuotes) {
+      if (current.trim()) {
+        result.push(current.trim());
+      }
+      current = "";
+    } else {
+      current += char;
+    }
+  }
+
+  if (current.trim()) {
+    result.push(current.trim());
+  }
+
+  return result;
+}
+
+/**
  * Parses ability effect string into array of AbilityEffect objects
  * Based on VB5 AbilityData.cls SetEffect method (lines 63-191)
  *
@@ -27,8 +62,8 @@ import { validateRange, validateTraits } from "./validators";
 export function parseAbilityEffects(effectString: string): AbilityEffect[] {
   const effects: AbilityEffect[] = [];
 
-  // Split by space to get individual effects
-  const effectList = effectString.trim().split(/\s+/);
+  // Split by space to get individual effects, respecting double quotes
+  const effectList = splitEffectString(effectString.trim());
 
   for (const effectItem of effectList) {
     if (!effectItem) continue;
@@ -60,39 +95,8 @@ export function parseAbilityEffects(effectString: string): AbilityEffect[] {
           buf = buf.substring(1, buf.length - 1);
         }
 
-        // Parse data part (may have nested Lv/= syntax)
-        const dataLvIndex = buf.indexOf("Lv");
-        const dataEqIndex = buf.indexOf("=");
-
-        let dataType = "";
-        let dataLevel = "";
-        let dataValue = "";
-
-        if (
-          dataLvIndex > 0 &&
-          (dataEqIndex === -1 || dataLvIndex < dataEqIndex)
-        ) {
-          // Data part has level specification
-          dataType = buf.substring(0, dataLvIndex);
-          if (dataEqIndex > 0) {
-            dataLevel = buf.substring(dataLvIndex + 2, dataEqIndex);
-            dataValue = buf.substring(dataEqIndex + 1);
-          } else {
-            dataLevel = buf.substring(dataLvIndex + 2);
-          }
-        } else if (dataEqIndex > 0) {
-          // Data part has data specification
-          dataType = buf.substring(0, dataEqIndex);
-          dataValue = buf.substring(dataEqIndex + 1);
-        } else {
-          // Simple data specification
-          dataType = buf;
-        }
-
-        effectData = [dataType, dataLevel, dataValue]
-          .filter((s) => s)
-          .join(" ")
-          .trim();
+        // Keep the data as-is (preserve original format like "バリアLv500=念動バリア")
+        effectData = buf;
       } else {
         // No data specification
         const levelStr = buf.substring(lvIndex + 2);
@@ -111,39 +115,8 @@ export function parseAbilityEffects(effectString: string): AbilityEffect[] {
         buf = buf.substring(1, buf.length - 1);
       }
 
-      // Parse data part
-      const dataLvIndex = buf.indexOf("Lv");
-      const dataEqIndex = buf.indexOf("=");
-
-      let dataType = "";
-      let dataLevel = "";
-      let dataValue = "";
-
-      if (effectType === "解説") {
-        // Special case: explanation
-        dataType = buf;
-      } else if (dataLvIndex > 0) {
-        // Data part has level specification
-        dataType = buf.substring(0, dataLvIndex);
-        if (dataEqIndex > 0) {
-          dataLevel = buf.substring(dataLvIndex + 2, dataEqIndex);
-          dataValue = buf.substring(dataEqIndex + 1);
-        } else {
-          dataLevel = buf.substring(dataLvIndex + 2);
-        }
-      } else if (dataEqIndex > 0) {
-        // Data part has data specification
-        dataType = buf.substring(0, dataEqIndex);
-        dataValue = buf.substring(dataEqIndex + 1);
-      } else {
-        // Simple data specification
-        dataType = buf;
-      }
-
-      effectData = [dataType, dataLevel, dataValue]
-        .filter((s) => s)
-        .join(" ")
-        .trim();
+      // Keep the data as-is (preserve original format)
+      effectData = buf;
     } else {
       // Simple effect (no level, no data)
       effectType = buf;

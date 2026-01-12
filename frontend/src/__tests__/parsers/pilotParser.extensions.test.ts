@@ -50,7 +50,7 @@ describe("Pilot Parser", () => {
       expect(pilot.weapons[0].minRange).toBe(1);
       expect(pilot.weapons[0].maxRange).toBe(4);
       expect(pilot.weapons[0].accuracyMod).toBe(20);
-      expect(pilot.weapons[0].ammo).toBeUndefined();
+      expect(pilot.weapons[0].ammo).toBe(0);
       expect(pilot.weapons[0].enCost).toBe(30);
       expect(pilot.weapons[0].requiredMorale).toBe(110);
       expect(pilot.weapons[0].criticalMod).toBe(10);
@@ -75,14 +75,19 @@ describe("Pilot Parser", () => {
       expect(pilot.abilities).toHaveLength(2);
       expect(pilot.abilities[0].name).toBe("霧の守り");
       expect(pilot.abilities[0].effects).toHaveLength(1);
-      expect(pilot.abilities[0].effects[0]).toBe(
-        '付加Lv3="アーマーLv3=霧の守り 火"'
+      expect(pilot.abilities[0].effects[0].effectType).toBe("付加");
+      expect(pilot.abilities[0].effects[0].effectLevel).toBe(3);
+      expect(pilot.abilities[0].effects[0].effectData).toBe(
+        "アーマーLv3=霧の守り 火"
       );
       expect(pilot.abilities[0].minRange).toBe(0);
-      expect(pilot.abilities[0].stock).toBeUndefined();
+      expect(pilot.abilities[0].stock).toBe(0);
       expect(pilot.abilities[0].enCost).toBe(10);
       expect(pilot.abilities[1].name).toBe("浄化の光");
-      expect(pilot.abilities[1].effects).toBe("回復Lv30");
+      expect(pilot.abilities[1].effects).toHaveLength(1);
+      expect(pilot.abilities[1].effects[0].effectType).toBe("回復");
+      expect(pilot.abilities[1].effects[0].effectLevel).toBe(30);
+      expect(pilot.abilities[1].effects[0].effectData).toBe("");
       expect(pilot.abilities[1].stock).toBe(3);
       expect(pilot.abilities[1].enCost).toBe(20);
     });
@@ -128,14 +133,19 @@ describe("Pilot Parser", () => {
       expect(pilot.abilities).toHaveLength(2);
       expect(pilot.abilities[0].name).toBe("念動バリア");
       expect(pilot.abilities[0].effects).toHaveLength(1);
-      expect(pilot.abilities[0].effects[0]).toBe(
-        '付加Lv5="バリアLv500=念動バリア"'
+      expect(pilot.abilities[0].effects[0].effectType).toBe("付加");
+      expect(pilot.abilities[0].effects[0].effectLevel).toBe(5);
+      expect(pilot.abilities[0].effects[0].effectData).toBe(
+        "バリアLv500=念動バリア"
       );
       expect(pilot.abilities[0].stock).toBe(3);
       expect(pilot.abilities[0].enCost).toBe(15);
       expect(pilot.abilities[0].requiredMorale).toBe(105);
       expect(pilot.abilities[1].name).toBe("精神回復");
-      expect(pilot.abilities[1].effects).toBe("回復SPLv30");
+      expect(pilot.abilities[1].effects).toHaveLength(1);
+      expect(pilot.abilities[1].effects[0].effectType).toBe("ＳＰ回復");
+      expect(pilot.abilities[1].effects[0].effectLevel).toBe(30);
+      expect(pilot.abilities[1].effects[0].effectData).toBe("");
       expect(pilot.abilities[1].stock).toBe(1);
     });
   });

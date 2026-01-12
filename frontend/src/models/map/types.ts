@@ -11,12 +11,28 @@ export const POSITION = {
 export type Position = (typeof POSITION)[keyof typeof POSITION];
 
 export type Terrain = {
-  id: number;
+  id: Integer;
   name: string;
+  graphicFileNamePrefix: string;
   type: TERRAIN_TYPE;
-  cost: Integer;
+  cost: Float;
   defenseBonusRate?: Float;
   evasionBonusRate?: Float;
-  hpRecoverRate?: Float;
-  enRecoverRate?: Float;
+  features: TerrainFeature[];
+  hideInEditor?: boolean;
 };
+
+export type TerrainFeature = {
+  spec: TerrainFeatureSpec;
+  level: Float;
+  parameters: string[];
+};
+
+export type TerrainFeatureSpec = {
+  name: string;
+  effects: TerrainEffect[];
+};
+
+export interface TerrainEffect {
+  name: string;
+}

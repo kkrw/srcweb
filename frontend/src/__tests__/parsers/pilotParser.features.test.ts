@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { parsePilotFile } from "../../parsers/pilotParser";
+import { decodeShiftJIS } from "../../parsers/utils";
 
 describe("Pilot Parser", () => {
   const samplePilotText = decodeShiftJIS(

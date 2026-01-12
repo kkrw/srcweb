@@ -51,6 +51,30 @@ export const ERROR_MESSAGES = {
   ABILITY_NEEDS_EMPTY_LINE: 'アビリティデータの終りに空行を置いてください。',
   INSUFFICIENT_ABILITY_PARAMS: 'アビリティのパラメータが抜けています。',
   MISSING_ABILITY_NAME: 'アビリティ名の設定が間違っています。',
+
+  // Map file errors
+  MAP_FILE_EMPTY: 'マップファイルが空です。',
+  MAP_MISSING_SIZE: 'マップサイズ情報がありません。',
+  MAP_INVALID_SIZE: 'マップサイズの形式が不正です。',
+  MAP_INVALID_SIZE_VALUE: 'マップサイズの値が不正です。',
+  MAP_SIZE_OUT_OF_RANGE: 'マップサイズが不正です。',
+  MAP_INSUFFICIENT_DATA: 'マップデータが不足しています。',
+  MAP_EMPTY_TERRAIN_LINE: '空の地形データ行です。',
+  MAP_INVALID_TERRAIN_FORMAT: '地形データの形式が不正です。',
+  MAP_INVALID_TERRAIN_VALUE: '地形データの値が不正です。',
+
+  // Terrain data file errors
+  TERRAIN_FILE_EMPTY: '地形データファイルが空です。',
+  TERRAIN_INVALID_ID: '地形番号が不正です。',
+  TERRAIN_ID_OUT_OF_RANGE: '地形番号は0〜1999の範囲で指定してください。',
+  TERRAIN_MISSING_NAME_LINE: '地形名称の設定が抜けています。',
+  TERRAIN_INVALID_NAME_FORMAT: '地形名称の形式が不正です。',
+  TERRAIN_MISSING_TYPE_LINE: '地形タイプの設定が抜けています。',
+  TERRAIN_INVALID_TYPE_FORMAT: '地形タイプの形式が不正です。',
+  TERRAIN_INVALID_TYPE: '地形タイプが不正です。',
+  TERRAIN_INVALID_COST: '移動コストが不正です。',
+  TERRAIN_INVALID_EVASION: '回避修正が不正です。',
+  TERRAIN_INVALID_DAMAGE: 'ダメージ修正が不正です。',
 } as const;
 
 /**

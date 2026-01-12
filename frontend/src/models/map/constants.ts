@@ -1,13 +1,17 @@
 import type { Integer } from "../BrandedTypes";
 
-export type TERRAIN_TYPE =
-  | "陸"
-  | "空"
-  | "水"
-  | "深水"
-  | "屋内"
-  | "宇宙"
-  | "月面";
+/** Valid terrain types */
+export const TERRAIN_TYPES = [
+  "陸",
+  "空",
+  "水",
+  "深水",
+  "屋内",
+  "宇宙",
+  "月面",
+] as const;
+
+export type TERRAIN_TYPE = (typeof TERRAIN_TYPES)[number];
 
 export const TERRAIN_UNKNOWN = {
   id: 0,

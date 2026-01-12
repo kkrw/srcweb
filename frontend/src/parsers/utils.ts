@@ -15,8 +15,12 @@ export interface ParseNumericResult {
 /**
  * Decodes Shift-JIS buffer to UTF-8 string
  */
-export function decodeShiftJIS(buffer: ArrayBuffer): string {
-  const uint8Array = new Uint8Array(buffer);
+export function decodeShiftJIS(buffer: Buffer): string {
+  const arrayBuffer = buffer.buffer.slice(
+    buffer.byteOffset,
+    buffer.byteOffset + buffer.byteLength
+  );
+  const uint8Array = new Uint8Array(arrayBuffer);
 
   // Detect encoding (should be Shift-JIS)
   const detectedEncoding = Encoding.detect(uint8Array);

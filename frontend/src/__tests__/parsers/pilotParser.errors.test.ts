@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { ERROR_MESSAGES } from "../../parsers/messages";
 import { ParseError } from "../../parsers/ParseResult";
 import { parsePilotFile } from "../../parsers/pilotParser";
 import { decodeShiftJIS } from "../../parsers/utils";
@@ -117,9 +118,7 @@ describe("Pilot Parser", () => {
       if (!result.success) {
         expect(result.error).toBeInstanceOf(ParseError);
         const parseError = result.error as ParseError;
-        expect(parseError.message).toContain(
-          "名称に半角スペースを使うことは出来ません"
-        );
+        expect(parseError.message).toContain(ERROR_MESSAGES.NAME_HAS_SPACE);
         expect(parseError.lineNumber).toBe(5);
       }
     });
@@ -145,7 +144,7 @@ describe("Pilot Parser", () => {
       if (!result.success) {
         expect(result.error).toBeInstanceOf(ParseError);
         const parseError = result.error as ParseError;
-        expect(parseError.message).toContain("ダブルクオート");
+        expect(parseError.message).toContain(ERROR_MESSAGES.NAME_HAS_QUOTE);
         expect(parseError.lineNumber).toBe(5);
       }
     });
